@@ -1,0 +1,341 @@
+{
+  "schema_version": 2,
+  "status": "active",
+  "files": [
+    {
+      "path": "engine/rates/go.mod",
+      "owner": "rates",
+      "surface": "product",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "runtime-input",
+          "to": "project:rates"
+        }
+      ]
+    },
+    {
+      "path": "engine/rates/rate.go",
+      "owner": "rates",
+      "surface": "product",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "runtime-input",
+          "to": "project:rates"
+        }
+      ]
+    },
+    {
+      "path": "verification/contracts/go.mod",
+      "owner": "rates-tests",
+      "surface": "test",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "runtime-input",
+          "to": "project:rates-tests"
+        }
+      ]
+    },
+    {
+      "path": "verification/contracts/contract_test.go",
+      "owner": "rates-tests",
+      "surface": "test",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "runtime-input",
+          "to": "project:rates-tests"
+        }
+      ]
+    },
+    {
+      "path": "CLAUDE.md",
+      "owner": "repository",
+      "surface": "instruction-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "owner": "repository",
+      "surface": "instruction-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ],
+      "symlink": "CLAUDE.md"
+    },
+    {
+      "path": ".chrono-harness/instructions/catalog.json",
+      "owner": "repository",
+      "surface": "instruction-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/instructions/manifest.json",
+      "owner": "repository",
+      "surface": "instruction-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/instructions/host-context.md",
+      "owner": "repository",
+      "surface": "instruction-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/bootstrap.json",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/distribution/chrono-harness.tar.gz",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/projects.json",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/FILEMAP.json",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/ci/check.json",
+      "owner": "repository",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/bootstrap.py",
+      "owner": "bootstrap",
+      "surface": "judge-implementation",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/bootstrap_test.py",
+      "owner": "bootstrap-tests",
+      "surface": "test",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/ci/github.json",
+      "owner": "repository",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/chrono-ci.yml",
+      "owner": "repository",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": "README.md",
+      "owner": "repository",
+      "surface": "documentation",
+      "cost": "unmeasured",
+      "edges": []
+    },
+    {
+      "path": ".chrono-harness/distribution/README.md",
+      "owner": "repository",
+      "surface": "documentation",
+      "cost": "unmeasured",
+      "edges": []
+    }
+  ],
+  "project_edges": [
+    {
+      "from": "project:rates",
+      "kind": "test-execution",
+      "to": "test:rates-tests"
+    },
+    {
+      "from": "project:rates-tests",
+      "kind": "test-execution",
+      "to": "test:rates-tests"
+    },
+    {
+      "from": "project:rates",
+      "kind": "compile",
+      "to": "project:rates-tests"
+    },
+    {
+      "from": "script:bootstrap",
+      "kind": "test-execution",
+      "to": "test:bootstrap-tests"
+    },
+    {
+      "from": "script:bootstrap-tests",
+      "kind": "test-execution",
+      "to": "test:bootstrap-tests"
+    }
+  ],
+  "cost_models": {
+    "unmeasured": {
+      "cpu_ms": null,
+      "wall_ms": null,
+      "peak_rss_bytes": null,
+      "io_bytes": null,
+      "basis": "not measured"
+    }
+  },
+  "test_costs": [
+    {
+      "test": "rates-tests",
+      "cost": "unmeasured"
+    },
+    {
+      "test": "bootstrap-tests",
+      "cost": "unmeasured"
+    }
+  ],
+  "execution_plans": {
+    "test:rates-tests": {
+      "operations": [
+        "build.rates",
+        "test.rates"
+      ],
+      "timeout_seconds": 120,
+      "output_limit_bytes": 1048576
+    },
+    "test:bootstrap-tests": {
+      "operations": [
+        "ci.verify",
+        "test.bootstrap"
+      ],
+      "timeout_seconds": 60,
+      "output_limit_bytes": 1048576
+    }
+  }
+}

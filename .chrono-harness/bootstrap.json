@@ -1,0 +1,70 @@
+{
+  "schema": "chrono-example-bootstrap/v1",
+  "distribution": {
+    "repository": "https://github.com/ChronoAIProject/chrono-harness",
+    "revision": "f53f62e2da07ef087decf078584c7449158565da",
+    "path": ".chrono-harness/distribution/chrono-harness.tar.gz",
+    "integrity": "sha256-74e1fd5628d819cb897fdd961585275231df9c74cc3bdcddfec5c1a94ced5ae9",
+    "members": [
+      "crates/runner",
+      "crates/judge-ci",
+      "crates/judge-projects",
+      "crates/judge-routes",
+      "crates/judge-registration",
+      "crates/judge-filemap",
+      "crates/judge-mixed",
+      "crates/ci",
+      "crates/instructions",
+      "assets/instructions",
+      "docs/licenses"
+    ]
+  },
+  "rust_toolchain": "1.95.0",
+  "builds": [
+    {
+      "manifest": "crates/runner/Cargo.toml",
+      "binary": "crates/runner/target/debug/chrono-harness",
+      "install": ".chrono-harness/bin/chrono-harness"
+    },
+    {
+      "manifest": "crates/judge-ci/Cargo.toml",
+      "binary": "crates/judge-ci/target/debug/chrono-judge-ci",
+      "install": ".chrono-harness/bin/chrono-judge-ci"
+    },
+    {
+      "manifest": "crates/ci/Cargo.toml",
+      "binary": "crates/ci/target/debug/chrono-ci",
+      "install": ".chrono-harness/bin/chrono-ci"
+    },
+    {
+      "manifest": "crates/instructions/Cargo.toml",
+      "binary": "crates/instructions/target/debug/chrono-instructions",
+      "install": ".chrono-harness/bin/chrono-instructions"
+    }
+  ],
+  "downloads": [
+    {
+      "directory": ".chrono-harness/state/sdk/go",
+      "variants": {
+        "darwin-arm64": {
+          "url": "https://go.dev/dl/go1.24.2.darwin-arm64.tar.gz",
+          "integrity": "sha256-b70f8b3c5b4ccb0ad4ffa5ee91cd38075df20fdbd953a1daedd47f50fbcff47a"
+        },
+        "linux-x86_64": {
+          "url": "https://go.dev/dl/go1.24.2.linux-amd64.tar.gz",
+          "integrity": "sha256-68097bd680839cbc9d464a0edce4f7c333975e27a90246890e9f1078c7e702ad"
+        }
+      }
+    }
+  ],
+  "probes": {
+    "harness": [
+      ".chrono-harness/bin/chrono-harness",
+      "--version"
+    ],
+    "go": [
+      ".chrono-harness/state/sdk/go/go/bin/go",
+      "version"
+    ]
+  }
+}

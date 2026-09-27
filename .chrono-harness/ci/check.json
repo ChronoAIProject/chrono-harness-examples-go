@@ -1,0 +1,40 @@
+{
+  "schema": "chrono-ci-check/v1",
+  "judge": {
+    "program": ".chrono-harness/bin/chrono-judge-ci",
+    "args": [],
+    "timeout_seconds": 600,
+    "output_limit_bytes": 8388608
+  },
+  "report_path": ".chrono-harness/state/check.json",
+  "policy": {
+    "filemap": ".chrono-harness/FILEMAP.json",
+    "projects": ".chrono-harness/projects.json",
+    "tools": {
+      "python3": "python3",
+      "chrono-ci": ".chrono-harness/bin/chrono-ci",
+      "chrono-instructions": ".chrono-harness/bin/chrono-instructions",
+      "go": ".chrono-harness/state/sdk/go/go/bin/go"
+    },
+    "artifacts": [
+      ".chrono-harness/bin/",
+      ".chrono-harness/state/"
+    ],
+    "required_inputs": [
+      ".chrono-harness/ci/check.json",
+      ".chrono-harness/ci/github.json",
+      ".chrono-harness/bootstrap.json",
+      ".chrono-harness/bootstrap.py",
+      ".github/workflows/chrono-ci.yml"
+    ],
+    "adoption_base": null,
+    "operation_timeout_seconds": 120,
+    "operation_output_limit_bytes": 1048576,
+    "environment": {
+      "GOTOOLCHAIN": "local",
+      "GOWORK": "off",
+      "GOPROXY": "off",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    }
+  }
+}

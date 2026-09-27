@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "status": "active",
+  "owners": [
+    "repository",
+    "bootstrap",
+    "bootstrap-tests",
+    "rates",
+    "rates-tests"
+  ],
+  "projects": [
+    {
+      "id": "rates",
+      "kind": "production",
+      "test_project": "rates-tests",
+      "actions": {
+        "build": {
+          "operation": "build.rates",
+          "tool": "go",
+          "argv": [
+            "-C",
+            "engine/rates",
+            "build",
+            "-mod=readonly",
+            "."
+          ]
+        }
+      }
+    },
+    {
+      "id": "rates-tests",
+      "kind": "test",
+      "tests_for": "rates",
+      "actions": {
+        "execute": {
+          "operation": "test.rates",
+          "tool": "go",
+          "argv": [
+            "-C",
+            "verification/contracts",
+            "test",
+            "-mod=readonly",
+            "-count=1",
+            "-v",
+            "."
+          ]
+        }
+      }
+    }
+  ],
+  "scripts": [
+    {
+      "id": "bootstrap",
+      "path": ".chrono-harness/bootstrap.py",
+      "test_script": "bootstrap-tests",
+      "actions": {
+        "execute": {
+          "operation": "bootstrap",
+          "tool": "python3",
+          "argv": [
+            ".chrono-harness/bootstrap.py",
+            "."
+          ]
+        },
+        "check": {
+          "operation": "ci.verify",
+          "tool": "chrono-ci",
+          "argv": [
+            "verify",
+            "--host-root",
+            ".",
+            "--config",
+            ".chrono-harness/ci/github.json"
+          ]
+        },
+        "generate": {
+          "operation": "instructions.generate",
+          "tool": "chrono-instructions",
+          "argv": [
+            "generate",
+            "--host-root",
+            "."
+          ]
+        }
+      }
+    },
+    {
+      "id": "bootstrap-tests",
+      "path": ".chrono-harness/bootstrap_test.py",
+      "tests_for": "bootstrap",
+      "actions": {
+        "execute": {
+          "operation": "test.bootstrap",
+          "tool": "python3",
+          "argv": [
+            "-B",
+            ".chrono-harness/bootstrap_test.py"
+          ]
+        }
+      }
+    }
+  ]
+}
