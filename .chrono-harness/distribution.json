@@ -1,15 +1,15 @@
 {
   "schema": "chrono-install/v1",
-  "version": "v0.1.0-beta.1",
+  "version": "v0.1.0-beta.2",
   "source": {
     "kind": "https",
-    "base_url": "https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.0-beta.1",
+    "base_url": "https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.0-beta.2",
     "curl": "/usr/bin/curl"
   },
   "manifest": {
     "file": "release.json",
-    "sha256": "159ae5f943df6c21d797f447492005e8aa5f128f64ad28e3bfe018442de241f2",
-    "size": 5458
+    "sha256": "ccd8958ada1af58293669893100cd23afe0983eba0387130f9378b4bbff7369e",
+    "size": 5859
   },
   "installers": {
     "linux-x86_64": {
