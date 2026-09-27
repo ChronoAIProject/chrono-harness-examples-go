@@ -44,7 +44,7 @@
   ],
   "downloads": [
     {
-      "directory": ".chrono-harness/state/sdk/go",
+      "directory": ".chrono-harness/cache/sdk/go",
       "variants": {
         "darwin-arm64": {
           "url": "https://go.dev/dl/go1.24.2.darwin-arm64.tar.gz",
@@ -63,7 +63,7 @@
       "--version"
     ],
     "go": [
-      ".chrono-harness/state/sdk/go/go/bin/go",
+      ".chrono-harness/cache/sdk/go/go/bin/go",
       "version"
     ]
   }

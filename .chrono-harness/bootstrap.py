@@ -41,6 +41,7 @@ def main():
         print('distribution digest verified; no installation or host checks executed')
         return
     state = root / '.chrono-harness/state'
+    cache_root = root / '.chrono-harness/cache'
     state.mkdir(parents=True, exist_ok=True)
     if args.local_product:
         source = args.local_product.resolve()
@@ -49,7 +50,7 @@ def main():
         if oid != cfg['distribution']['revision'] or dirt:
             raise ValueError('local product must be the exact clean pinned revision')
     else:
-        source = state / 'product-source' / cfg['distribution']['revision']
+        source = cache_root / 'product-source' / cfg['distribution']['revision']
         unpack(data, source)
     env = dict(os.environ, RUSTUP_TOOLCHAIN=cfg['rust_toolchain'])
     if subprocess.run(['rustup','run',cfg['rust_toolchain'],'rustc','--version'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode:
@@ -63,7 +64,7 @@ def main():
         variant = item['variants'].get(platform_id) or item['variants'].get('any')
         if not variant:
             raise ValueError('undeclared tool platform: '+platform_id)
-        cache = state / 'downloads' / variant['integrity'].replace('/', '_').replace('+', '_')
+        cache = cache_root / 'downloads' / variant['integrity'].replace('/', '_').replace('+', '_')
         cache.parent.mkdir(parents=True,exist_ok=True)
         data = cache.read_bytes() if cache.exists() else urllib.request.urlopen(variant['url'],timeout=120).read()
         verified(data, variant['integrity'])
