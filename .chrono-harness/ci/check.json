@@ -14,11 +14,12 @@
       "python3": "python3",
       "chrono-ci": ".chrono-harness/bin/chrono-ci",
       "chrono-instructions": ".chrono-harness/bin/chrono-instructions",
-      "go": ".chrono-harness/state/sdk/go/go/bin/go"
+      "go": ".chrono-harness/cache/sdk/go/go/bin/go"
     },
     "artifacts": [
       ".chrono-harness/bin/",
-      ".chrono-harness/state/"
+      ".chrono-harness/state/",
+      ".chrono-harness/cache/"
     ],
     "required_inputs": [
       ".chrono-harness/ci/check.json",
