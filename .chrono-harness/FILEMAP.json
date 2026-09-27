@@ -144,22 +144,6 @@
       ]
     },
     {
-      "path": ".chrono-harness/distribution/chrono-harness.tar.gz",
-      "owner": "repository",
-      "surface": "membership",
-      "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:rates-tests"
-        },
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
-    },
-    {
       "path": ".chrono-harness/projects.json",
       "owner": "repository",
       "surface": "membership",
@@ -267,11 +251,36 @@
       "edges": []
     },
     {
-      "path": ".chrono-harness/distribution/README.md",
+      "path": ".chrono-harness/distribution.json",
       "owner": "repository",
-      "surface": "documentation",
+      "surface": "membership",
       "cost": "unmeasured",
-      "edges": []
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/install.py",
+      "owner": "repository",
+      "surface": "judge-implementation",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
     }
   ],
   "project_edges": [

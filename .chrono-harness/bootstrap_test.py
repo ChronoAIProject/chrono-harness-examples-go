@@ -20,7 +20,7 @@ class Distribution(unittest.TestCase):
             self.assertEqual((target/'CLAUDE.md').read_bytes(),(root/'CLAUDE.md').read_bytes())
             self.assertEqual((root/'AGENTS.md').readlink(),Path('CLAUDE.md'))
     def test_exact_digest_accepts_and_corruption_rejects(self):
-        data=b'pinned product bytes'
+        data=b'pinned SDK bytes'
         digest='sha256-'+hashlib.sha256(data).hexdigest()
         self.assertEqual(bootstrap.verified(data,digest),data)
         with self.assertRaisesRegex(ValueError,'integrity mismatch'):

@@ -1,47 +1,5 @@
 {
-  "schema": "chrono-example-bootstrap/v1",
-  "distribution": {
-    "repository": "https://github.com/ChronoAIProject/chrono-harness",
-    "revision": "f53f62e2da07ef087decf078584c7449158565da",
-    "path": ".chrono-harness/distribution/chrono-harness.tar.gz",
-    "integrity": "sha256-74e1fd5628d819cb897fdd961585275231df9c74cc3bdcddfec5c1a94ced5ae9",
-    "members": [
-      "crates/runner",
-      "crates/judge-ci",
-      "crates/judge-projects",
-      "crates/judge-routes",
-      "crates/judge-registration",
-      "crates/judge-filemap",
-      "crates/judge-mixed",
-      "crates/ci",
-      "crates/instructions",
-      "assets/instructions",
-      "docs/licenses"
-    ]
-  },
-  "rust_toolchain": "1.95.0",
-  "builds": [
-    {
-      "manifest": "crates/runner/Cargo.toml",
-      "binary": "crates/runner/target/debug/chrono-harness",
-      "install": ".chrono-harness/bin/chrono-harness"
-    },
-    {
-      "manifest": "crates/judge-ci/Cargo.toml",
-      "binary": "crates/judge-ci/target/debug/chrono-judge-ci",
-      "install": ".chrono-harness/bin/chrono-judge-ci"
-    },
-    {
-      "manifest": "crates/ci/Cargo.toml",
-      "binary": "crates/ci/target/debug/chrono-ci",
-      "install": ".chrono-harness/bin/chrono-ci"
-    },
-    {
-      "manifest": "crates/instructions/Cargo.toml",
-      "binary": "crates/instructions/target/debug/chrono-instructions",
-      "install": ".chrono-harness/bin/chrono-instructions"
-    }
-  ],
+  "schema": "chrono-example-sdk/v1",
   "downloads": [
     {
       "directory": ".chrono-harness/cache/sdk/go",
