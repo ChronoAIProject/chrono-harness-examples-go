@@ -6,7 +6,7 @@
 
 ## 运行
 
-需要 Git、Python ≥3.9、rustup 和可下载依赖的网络。工具源码是固定修订 `f53f62e2da07ef087decf078584c7449158565da` 的独立分发包，位于 `.chrono-harness/distribution/`；它不是宿主代码。安装器仅构建登记的工具项目，并校验固定 Go/Node/TypeScript 下载包的摘要，不扫描宿主识别语言。支持 macOS arm64、Linux x86_64。
+需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.1](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.1) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
 
 ```sh
 python3 .chrono-harness/bootstrap.py .
@@ -27,4 +27,6 @@ python3 .chrono-harness/bootstrap.py .
 
 本仓运行现役 `chrono-ci-check/v1` scoped profile，验证实际命令、显式选测、干净快照和退出结果。它不冒充完整七判官治理，不证明工具链输入闭包完整或测试依赖无遗漏。完整 projects 判官在该固定版本仍要求 Cargo manifest/lock/target；这个缺陷正在 chrono-harness 主项目中解耦，本仓的无 manifest 项目就是后续完整接入的验收输入。
 
-CI 从本仓内保留的固定工具分发包构建，无需另一个私有库的访问凭据。Rust 是工具的实现语言，不是宿主的语言要求。成本暂未测量，登记为 unknown。
+本地与 CI 通过相同 bootstrap 从公开 Release 校验安装；不需要跨仓凭据。安装结果见 `.chrono-harness/state/distribution.json`，语言 SDK 版本另见 `bootstrap-result.json`。成本暂未测量，登记为 unknown。
+
+[主库与示例索引](https://github.com/ChronoAIProject/chrono-harness/blob/dev/docs/examples.md) 列出 Go、TS 和混合语言宿主。
