@@ -6,7 +6,7 @@
 
 ## 运行
 
-需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.5](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.5) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
+需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.6](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.6) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
 
 ```sh
 python3 .chrono-harness/bootstrap.py .
@@ -30,3 +30,24 @@ python3 .chrono-harness/bootstrap.py .
 本地与 CI 通过相同 bootstrap 从公开 Release 校验安装；不需要跨仓凭据。安装结果见 `.chrono-harness/state/distribution.json`，语言 SDK 版本另见 `bootstrap-result.json`。成本暂未测量，登记为 unknown。
 
 [主库与示例索引](https://github.com/ChronoAIProject/chrono-harness/blob/dev/docs/examples.md) 列出 Go、TS 和混合语言宿主。
+
+## Registered worktrees
+
+The pinned release also installs `chrono-worktree`. The host policy is
+`.chrono-harness/worktree.json`; shared registries explicitly declare `dev`,
+`feature/`, `integration/`, file ownership and artifacts. Project and FILEMAP
+registrations have one owner; directory names and languages do not select work.
+
+```sh
+.chrono-harness/bin/chrono-worktree start --host-root . --config .chrono-harness/worktree.json --kind feature --name change --path ../my-change
+```
+
+The destination must not exist. `reconstruct` uses the same arguments plus
+`--plan .chrono-harness/state/reconstruction.json`, with explicit fixed base and
+candidate OIDs and a complete carry/retire path list. See the
+[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.6/docs/worktree.md).
+Creation/reconstruction records actual Git results and preserves old work;
+reconstruction stages changes and requires a new commit and the canonical check.
+PR creation, merge and cleanup remain caller-owned. Shared full-governance
+registries are proposed; worktree use does not activate them or establish full
+input closure, freshness certification or deterministic local/CI parity.

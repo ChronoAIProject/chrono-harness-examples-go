@@ -28,7 +28,11 @@
       ".chrono-harness/bootstrap.py",
       ".github/workflows/chrono-ci.yml",
       ".chrono-harness/distribution.json",
-      ".chrono-harness/install.py"
+      ".chrono-harness/install.py",
+      ".chrono-harness/config.json",
+      ".chrono-harness/judges.json",
+      ".chrono-harness/workflow.json",
+      ".chrono-harness/worktree.json"
     ],
     "adoption_base": null,
     "operation_timeout_seconds": 120,
