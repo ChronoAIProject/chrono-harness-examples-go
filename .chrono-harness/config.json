@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "status": "proposed",
+  "enforcement": "not-implemented",
+  "runner": {
+    "path": ".chrono-harness/bin/chrono-harness",
+    "version": "0.1.0",
+    "sha256": null
+  },
+  "registries": {
+    "judges": ".chrono-harness/judges.json",
+    "projects": ".chrono-harness/projects.json",
+    "filemap": ".chrono-harness/FILEMAP.json",
+    "workflow": ".chrono-harness/workflow.json"
+  },
+  "canonical_check": {
+    "operation": "validate.delta",
+    "argv": [
+      ".chrono-harness/bin/chrono-harness",
+      "check",
+      "--config",
+      ".chrono-harness/ci/check.json",
+      "--base",
+      "{base}",
+      "--candidate",
+      "{candidate}"
+    ]
+  },
+  "tools": [
+    {
+      "id": "python3",
+      "program": "python3",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-ci",
+      "program": ".chrono-harness/bin/chrono-ci",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-instructions",
+      "program": ".chrono-harness/bin/chrono-instructions",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "go",
+      "program": ".chrono-harness/cache/sdk/go/go/bin/go",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "version"
+      ],
+      "expected_version": null
+    }
+  ],
+  "protocol": {
+    "id": "chrono-judge/v1",
+    "timeout_seconds": 120,
+    "stdout_limit_bytes": 1048576,
+    "encoding": "UTF-8"
+  },
+  "semantic_fields": [],
+  "artifacts": [
+    {
+      "path": ".chrono-harness/bin/",
+      "owner": "repository",
+      "kind": "executable",
+      "tracked": false
+    },
+    {
+      "path": ".chrono-harness/state/",
+      "owner": "repository",
+      "kind": "evidence",
+      "tracked": false
+    },
+    {
+      "path": ".chrono-harness/cache/",
+      "owner": "repository",
+      "kind": "download-cache",
+      "tracked": false
+    }
+  ],
+  "environment": {
+    "inherit": [
+      "PATH",
+      "HOME"
+    ],
+    "values": {
+      "GOTOOLCHAIN": "local",
+      "GOWORK": "off",
+      "GOPROXY": "off",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "inputs": []
+  },
+  "input_closure": {
+    "status": "incomplete",
+    "unresolved": [
+      "Bootstrap provenance, complete effective inputs and governance activation are not certified."
+    ]
+  }
+}
