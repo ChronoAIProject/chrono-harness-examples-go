@@ -6,7 +6,7 @@
 
 ## 运行
 
-需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.7](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.7) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
+需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.8](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.8) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
 
 ```sh
 python3 .chrono-harness/bootstrap.py .
@@ -45,7 +45,7 @@ registrations have one owner; directory names and languages do not select work.
 The destination must not exist. `reconstruct` uses the same arguments plus
 `--plan .chrono-harness/state/reconstruction.json`, with explicit fixed base and
 candidate OIDs and a complete carry/retire path list. See the
-[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.7/docs/worktree.md).
+[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.8/docs/worktree.md).
 Creation/reconstruction records actual Git results and preserves old work;
 reconstruction stages changes and requires a new commit and the canonical check.
 PR creation and merge remain caller-owned. Shared full-governance
@@ -69,6 +69,26 @@ requires an explicit retained branch/commit and selected disposable artifacts.
 Fetch-ref cleanup requires its original failed receipt and a fixed local branch
 preserving the expected commit. Reports retain failures and distinguish verified
 removal from unverified partial effects. See the pinned
-[maintenance contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.7/docs/worktree.md#registered-recovery-and-cleanup)
-for complete plan formats. Missing/interrupted receipts, damaged Git metadata,
+[maintenance contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.8/docs/worktree.md#registered-recovery-and-cleanup)
+for complete plan formats. Lost recovery identity, damaged Git metadata,
 remote branch retirement and PR/merge orchestration remain separate obligations.
+
+
+## Interrupted operations
+
+The installed tool writes separate immutable intents before checkout/lock effects
+and before fetching. After establishing that the original process stopped, supply
+an explicit intent digest and original-result presence/digest to:
+
+```sh
+.chrono-harness/bin/chrono-worktree recover-interrupted --host-root . --config .chrono-harness/worktree.json --plan .chrono-harness/state/interrupted-checkout.json
+.chrono-harness/bin/chrono-worktree cleanup-fetch-interrupted --host-root . --config .chrono-harness/worktree.json --plan .chrono-harness/state/interrupted-fetch.json
+```
+
+Checkout recovery also requires the reconciled HEAD/index tree. Fetch cleanup
+requires the expected current OID and a local branch retaining it; an already
+absent ref needs an explicit retry plan. Both preserve the original bytes and
+keep the original outcome unknown; terminal reports use ordinary maintenance.
+See the pinned [interruption contracts](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.8/docs/worktree.md#interrupted-checkout-recovery).
+These commands do not reconstruct a lost index, make concurrent writers atomic,
+or certify full governance or deterministic parity.
