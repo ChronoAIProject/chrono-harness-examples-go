@@ -6,7 +6,7 @@
 
 ## 运行
 
-需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.6](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.6) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
+需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.7](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.7) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
 
 ```sh
 python3 .chrono-harness/bootstrap.py .
@@ -45,9 +45,30 @@ registrations have one owner; directory names and languages do not select work.
 The destination must not exist. `reconstruct` uses the same arguments plus
 `--plan .chrono-harness/state/reconstruction.json`, with explicit fixed base and
 candidate OIDs and a complete carry/retire path list. See the
-[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.6/docs/worktree.md).
+[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.7/docs/worktree.md).
 Creation/reconstruction records actual Git results and preserves old work;
 reconstruction stages changes and requires a new commit and the canonical check.
-PR creation, merge and cleanup remain caller-owned. Shared full-governance
+PR creation and merge remain caller-owned. Shared full-governance
 registries are proposed; worktree use does not activate them or establish full
 input closure, freshness certification or deterministic local/CI parity.
+
+## Registered maintenance
+
+The same installed `chrono-worktree` consumes explicit maintenance plans under
+`.chrono-harness/state/` with the registered `.chrono-harness/worktree.json`:
+
+```sh
+.chrono-harness/bin/chrono-worktree recover --host-root . --config .chrono-harness/worktree.json --plan .chrono-harness/state/recover.json
+.chrono-harness/bin/chrono-worktree cleanup --host-root . --config .chrono-harness/worktree.json --plan .chrono-harness/state/cleanup.json
+.chrono-harness/bin/chrono-worktree cleanup-fetch --host-root . --config .chrono-harness/worktree.json --plan .chrono-harness/state/cleanup-fetch.json
+```
+
+Recovery validates the original failure, reconciled HEAD/index and owned lock;
+staged changes still need a candidate commit and the canonical check. Cleanup
+requires an explicit retained branch/commit and selected disposable artifacts.
+Fetch-ref cleanup requires its original failed receipt and a fixed local branch
+preserving the expected commit. Reports retain failures and distinguish verified
+removal from unverified partial effects. See the pinned
+[maintenance contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.7/docs/worktree.md#registered-recovery-and-cleanup)
+for complete plan formats. Missing/interrupted receipts, damaged Git metadata,
+remote branch retirement and PR/merge orchestration remain separate obligations.
