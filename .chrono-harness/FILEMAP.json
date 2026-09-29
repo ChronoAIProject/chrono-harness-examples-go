@@ -220,7 +220,7 @@
       ]
     },
     {
-      "path": ".chrono-harness/ci/github.json",
+      "path": ".chrono-harness/ci/units.json",
       "owner": "repository",
       "surface": "judge-policy",
       "cost": "unmeasured",
@@ -309,6 +309,30 @@
       "surface": "judge-policy",
       "cost": "unmeasured",
       "edges": []
+    },
+    {
+      "path": ".github/workflows/chrono-ci-rates.yml",
+      "owner": "repository",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/chrono-ci-harness.yml",
+      "owner": "repository",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
     }
   ],
   "project_edges": [

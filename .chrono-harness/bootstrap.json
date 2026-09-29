@@ -1,5 +1,5 @@
 {
-  "schema": "chrono-example-sdk/v1",
+  "schema": "chrono-example-sdk/v2",
   "downloads": [
     {
       "directory": ".chrono-harness/cache/sdk/go",
@@ -12,7 +12,8 @@
           "url": "https://go.dev/dl/go1.24.2.linux-amd64.tar.gz",
           "integrity": "sha256-68097bd680839cbc9d464a0edce4f7c333975e27a90246890e9f1078c7e702ad"
         }
-      }
+      },
+      "id": "go"
     }
   ],
   "probes": {
@@ -24,5 +25,38 @@
       ".chrono-harness/cache/sdk/go/go/bin/go",
       "version"
     ]
+  },
+  "default_profile": "all",
+  "profiles": {
+    "all": {
+      "downloads": [
+        "go"
+      ],
+      "probes": [
+        "harness",
+        "go"
+      ]
+    },
+    "harness": {
+      "downloads": [],
+      "probes": [
+        "harness"
+      ]
+    },
+    "collection": {
+      "downloads": [],
+      "probes": [
+        "harness"
+      ]
+    },
+    "rates": {
+      "downloads": [
+        "go"
+      ],
+      "probes": [
+        "harness",
+        "go"
+      ]
+    }
   }
 }

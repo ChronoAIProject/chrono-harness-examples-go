@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the pinned harness release, then the explicitly registered host SDKs."""
+"""Install pinned harness tools and SDKs from the selected explicit host profile."""
 import argparse, base64, hashlib, io, json, platform, shutil, subprocess, sys, tarfile, urllib.request
 from pathlib import Path
 
@@ -26,14 +26,41 @@ def unpack(data, target):
                     raise ValueError('archive link escapes distribution')
         archive.extractall(target)
 
+def selection(cfg, requested):
+    """Validate explicit profile references before performing installation effects."""
+    if cfg['schema'] != 'chrono-example-sdk/v2':
+        raise ValueError('E_BOOTSTRAP_PROFILE: unsupported bootstrap schema')
+    downloads = {}
+    for item in cfg['downloads']:
+        key = item.get('id')
+        if not isinstance(key, str) or not key or key in downloads:
+            raise ValueError('E_BOOTSTRAP_PROFILE: invalid or duplicate download ID')
+        downloads[key] = item
+    profiles = cfg['profiles']
+    if not isinstance(profiles, dict) or not profiles or cfg['default_profile'] not in profiles:
+        raise ValueError('E_BOOTSTRAP_PROFILE: missing default profile')
+    for key, profile in profiles.items():
+        if not key or set(profile) != {'downloads', 'probes'}:
+            raise ValueError('E_BOOTSTRAP_PROFILE: invalid profile fields')
+        for field, registered in [('downloads', downloads), ('probes', cfg['probes'])]:
+            names = profile[field]
+            if (not isinstance(names, list) or any(not isinstance(name, str) for name in names)
+                    or len(set(names)) != len(names) or any(name not in registered for name in names)):
+                raise ValueError('E_BOOTSTRAP_PROFILE: unknown or duplicate '+field+' reference')
+    name = requested if requested is not None else cfg['default_profile']
+    if name not in profiles:
+        raise ValueError('E_BOOTSTRAP_PROFILE: unknown profile '+name)
+    profile = profiles[name]
+    return name, [downloads[key] for key in profile['downloads']], {key: cfg['probes'][key] for key in profile['probes']}
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('host', type=Path)
+    parser.add_argument('--profile')
     args = parser.parse_args()
     root = args.host.resolve()
     cfg = json.loads((root / '.chrono-harness/bootstrap.json').read_text())
-    if cfg['schema'] != 'chrono-example-sdk/v1':
-        raise ValueError('unsupported bootstrap configuration')
+    profile, downloads, probes = selection(cfg, args.profile)
     subprocess.run([sys.executable, str(root / '.chrono-harness/install.py'), str(root)], check=True)
     distribution = json.loads((root / '.chrono-harness/state/distribution.json').read_text())
     state = root / '.chrono-harness/state'
@@ -41,7 +68,7 @@ def main():
     state.mkdir(parents=True, exist_ok=True)
     installed = []
     platform_id = platform.system().lower()+'-'+platform.machine().lower()
-    for item in cfg['downloads']:
+    for item in downloads:
         variant = item['variants'].get(platform_id) or item['variants'].get('any')
         if not variant:
             raise ValueError('undeclared tool platform: '+platform_id)
@@ -58,9 +85,9 @@ def main():
         destination.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(source_path,destination)
     versions = {}
-    for key, argv in cfg['probes'].items():
+    for key, argv in probes.items():
         versions[key] = subprocess.check_output(argv,cwd=root,text=True).strip()
-    (state / 'bootstrap-result.json').write_text(json.dumps({'release_version':distribution['version'],'source_revision':distribution['source_commit'],'versions':versions,'harness_installed':distribution['installed'],'installed':[{'path':str(dst.relative_to(root)),'sha256':hashlib.sha256(dst.read_bytes()).hexdigest()} for _,dst in installed]},indent=2)+'\n')
+    (state / 'bootstrap-result.json').write_text(json.dumps({'profile':profile,'downloads':[item['id'] for item in downloads],'release_version':distribution['version'],'source_revision':distribution['source_commit'],'versions':versions,'harness_installed':distribution['installed'],'installed':[{'path':str(dst.relative_to(root)),'sha256':hashlib.sha256(dst.read_bytes()).hexdigest()} for _,dst in installed]},indent=2)+'\n')
     print(json.dumps(versions))
 
 if __name__ == '__main__':

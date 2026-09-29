@@ -70,7 +70,7 @@
             "--host-root",
             ".",
             "--config",
-            ".chrono-harness/ci/github.json"
+            ".chrono-harness/ci/units.json"
           ]
         },
         "generate": {
