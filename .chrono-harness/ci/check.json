@@ -1,12 +1,12 @@
 {
-  "schema": "chrono-ci-check/v1",
+  "schema": "chrono-ci-check/v3",
   "judge": {
     "program": ".chrono-harness/bin/chrono-judge-ci",
     "args": [],
     "timeout_seconds": 600,
     "output_limit_bytes": 8388608
   },
-  "report_path": ".chrono-harness/state/check.json",
+  "report_path": ".chrono-harness/state/collection/check.json",
   "policy": {
     "filemap": ".chrono-harness/FILEMAP.json",
     "projects": ".chrono-harness/projects.json",
@@ -23,7 +23,7 @@
     ],
     "required_inputs": [
       ".chrono-harness/ci/check.json",
-      ".chrono-harness/ci/github.json",
+      ".chrono-harness/ci/units.json",
       ".chrono-harness/bootstrap.json",
       ".chrono-harness/bootstrap.py",
       ".github/workflows/chrono-ci.yml",
@@ -32,7 +32,9 @@
       ".chrono-harness/config.json",
       ".chrono-harness/judges.json",
       ".chrono-harness/workflow.json",
-      ".chrono-harness/worktree.json"
+      ".chrono-harness/worktree.json",
+      ".github/workflows/chrono-ci-rates.yml",
+      ".github/workflows/chrono-ci-harness.yml"
     ],
     "adoption_base": null,
     "operation_timeout_seconds": 120,
@@ -42,6 +44,21 @@
       "GOWORK": "off",
       "GOPROXY": "off",
       "PYTHONDONTWRITEBYTECODE": "1"
-    }
+    },
+    "units": {
+      "rates": {
+        "tests": [
+          "test:rates-tests"
+        ],
+        "report_path": ".chrono-harness/state/units/rates/check.json"
+      },
+      "harness": {
+        "tests": [
+          "test:bootstrap-tests"
+        ],
+        "report_path": ".chrono-harness/state/units/harness/check.json"
+      }
+    },
+    "shared_operations": {}
   }
 }
