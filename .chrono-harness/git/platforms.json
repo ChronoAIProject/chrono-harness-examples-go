@@ -1,0 +1,7 @@
+{
+  "schema": "chrono-git-configs/v1",
+  "platforms": {
+    "macos-aarch64": ".chrono-harness/git/macos.json",
+    "linux-x86_64": ".chrono-harness/git/linux.json"
+  }
+}

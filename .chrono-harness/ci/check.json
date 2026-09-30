@@ -4,7 +4,7 @@
     "program": ".chrono-harness/bin/chrono-judge-ci",
     "args": [],
     "timeout_seconds": 600,
-    "output_limit_bytes": 8388608
+    "output_limit_bytes": 16777216
   },
   "report_path": ".chrono-harness/state/collection/check.json",
   "policy": {
@@ -34,7 +34,11 @@
       ".chrono-harness/workflow.json",
       ".chrono-harness/worktree.json",
       ".github/workflows/chrono-ci-rates.yml",
-      ".github/workflows/chrono-ci-harness.yml"
+      ".github/workflows/chrono-ci-harness.yml",
+      ".chrono-harness/git/platforms.json",
+      ".chrono-harness/git/macos.json",
+      ".chrono-harness/git/linux.json",
+      ".chrono-harness/git/global.config"
     ],
     "adoption_base": null,
     "operation_timeout_seconds": 120,
@@ -59,6 +63,11 @@
         "report_path": ".chrono-harness/state/units/harness/check.json"
       }
     },
-    "shared_operations": {}
+    "shared_operations": {},
+    "facts_config": ".chrono-harness/git/platforms.json",
+    "collection_limits": {
+      "manifest_bytes": 1048576,
+      "report_bytes": 67108864
+    }
   }
 }
