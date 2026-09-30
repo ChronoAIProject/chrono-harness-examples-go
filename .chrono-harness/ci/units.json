@@ -1,7 +1,7 @@
 {
   "schema": "chrono-github-units/v1",
   "collection": {
-    "schema": "chrono-github-ci/v1",
+    "schema": "chrono-github-ci/v3",
     "workflow_path": ".github/workflows/chrono-ci.yml",
     "name": "chrono / collection",
     "runs_on": "ubuntu-24.04",
@@ -33,7 +33,8 @@
         "ref_prefix": "refs/heads/integration/",
         "base_ref": "refs/heads/dev"
       }
-    ]
+    ],
+    "facts_config": ".chrono-harness/git/platforms.json"
   },
   "units": {
     "rates": {

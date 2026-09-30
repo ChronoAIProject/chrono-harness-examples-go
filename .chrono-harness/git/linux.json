@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "facts_git": {
+    "tool": "facts-git",
+    "input": "facts-git-executable",
+    "guard": {
+      "schema": "chrono-git-inputs/v1",
+      "inputs": [
+        "facts-global-config",
+        "facts-local-include"
+      ]
+    }
+  },
+  "tools": [
+    {
+      "id": "facts-git",
+      "program": "/usr/bin/git",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": "git version 2.55.0"
+    }
+  ],
+  "environment": {
+    "inherit": [],
+    "values": {
+      "PATH": "/usr/bin:/bin",
+      "LC_ALL": "C",
+      "GIT_CONFIG_NOSYSTEM": "1",
+      "GIT_CONFIG_GLOBAL": ".chrono-harness/git/global.config",
+      "GIT_TERMINAL_PROMPT": "0"
+    },
+    "inputs": [
+      {
+        "id": "facts-git-executable",
+        "location": "/usr/bin/git",
+        "presence": "present",
+        "sha256": "d4d2ba562243015206d4248edfec871a74786499292d00ed072dbca2f5ae8073"
+      },
+      {
+        "id": "facts-global-config",
+        "location": ".chrono-harness/git/global.config",
+        "presence": "present",
+        "sha256": "595d2c5a526c5c6b84ae4c5952f6110b716705f3b31519c76a47c7d43af7916b"
+      },
+      {
+        "id": "facts-local-include",
+        "location": ".chrono-harness/git/local.config",
+        "presence": "absent"
+      }
+    ]
+  },
+  "protocol": {
+    "timeout_seconds": 120,
+    "stdout_limit_bytes": 1048576
+  }
+}
