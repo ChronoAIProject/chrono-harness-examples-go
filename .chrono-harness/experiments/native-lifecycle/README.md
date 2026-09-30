@@ -1,11 +1,12 @@
-# Native lifecycle provider qualification
+# Native CI event verification
 
-This fixture answers whether GitHub can admit only the intended checked candidate
-against the intended current base. It does not implement lifecycle orchestration,
-full seven-judge governance, or certify dev delivery. All remote operations below
-belong to the caller. Local tests are synthetic Git behavior tests, not native
-qualification. Preserve every failed/partial operation and stop the affected route
-when a prerequisite is missing; continue independent full-input/activation work.
+This fixture checks the identities and results of a named native CI route. It does
+not implement lifecycle orchestration, full seven-judge governance, or certify dev
+delivery. Local tests cover Git behavior; native runs supply their own observed
+evidence. All remote operations belong to the caller. Preserve failed/partial
+results and complete the checks required by the host's chosen registered route.
+Qualification of every provider route or all concurrent merges is not a prerequisite
+for ordinary delivery. Unverified provider guarantees remain unverified.
 
 ## Ownership and entry points
 
@@ -154,14 +155,15 @@ stdout/body, stderr/HTTP diagnostic and real exit status, including expected
 rejections. Do not let a shell's `set -e` discard the failure evidence. `--paginate
 --slurp` below means retain all pages and reject partial collection.
 
-1. **Prepare and preserve.** Re-read the actual dev tip before caller commit/push.
-   If the preparation base moved, rebuild on fresh integration with semantic
-   reconciliation; never recycle the old green. Commit this preparation, run the
-   full selected canonical DELTA and keep original reports. Verify that the target
-   and every proposed experiment branch name are absent; an existing name is not
-   permission to overwrite it. Push the tested fixture to the new dedicated target
-   and create each case from its fixed current tip, under unique
-   `feature/lifecycle-native-CASE-NN` names. Never force-push or delete old work.
+1. **Prepare and preserve.** Observe the current dev tip and the candidate before
+   commit/push. Judge branch expiry using the host's registered freshness limits;
+   a dev advance alone does not make a branch expired. Revalidate whenever the
+   base, candidate tree or other required evidence bindings change. Reconstruct
+   from current dev when expiry, actual conflicts or changed requirements require
+   it, retaining useful work and original failures. Commit the prepared fixture,
+   run the selected canonical DELTA and retain its reports. Verify any new branch
+   name is absent; an existing name is not permission to overwrite it. Push to the
+   dedicated target and create each necessary case from its fixed current tip.
 
 2. **Read settings before changing them.** Save the repository's default branch,
    Actions policy and all rules affecting the dedicated target. Preserve 404s as
@@ -223,139 +225,27 @@ rejections. Do not let a shell's `set -e` discard the failure evidence. `--pagin
    `GET /repos/$R/commits/$OID/statuses?per_page=100` with pagination. Unrelated
    generated harness greens are observations, never substitutes for this check.
 
-4. **Install a dedicated strict rule.** Create one new branch-only ruleset after a
-   real check established the source app ID. No bypass actors, no human approval
-   requirement, no wildcard/default/dev target. Initial direct-route qualification
-   deliberately requires status checks without a PR-only rule so a *checked*
-   fast-forward empty advancement can be attempted; this is not a production dev
-   policy. Force pushes and branch deletion are forbidden. If pre-existing rules
-   are stronger, retain them and stop any arm they make unavailable.
+4. **Use the chosen registered delivery route.** Complete that route's required
+   checks against the current candidate and base. Judge/stability changes require
+   successful integration evidence bound to those inputs. A changed binding
+   invalidates reuse of its old report; it does not by itself require a new branch
+   or reimplementation. Never manufacture successful checks or bypass a failure.
+   Use the provider's expected-head option when submitting the current candidate,
+   then verify actual landing SHA, tested tree, base mapping and target containment.
+   Retain mismatches as failures and repair them instead of certifying the landing.
 
-   ```sh
-   jq -n --argjson app "$APP_ID" '{name:"native-lifecycle-provider-qualification",target:"branch",enforcement:"active",bypass_actors:[],conditions:{ref_name:{include:["refs/heads/integration/lifecycle-native-target"],exclude:[]}},rules:[{type:"non_fast_forward"},{type:"deletion"},{type:"required_status_checks",parameters:{required_status_checks:[{context:"native lifecycle / probe",integration_id:$app}],strict_required_status_checks_policy:true,do_not_enforce_on_create:false}}]}' > "$E/strict-rule.json"
-   gh api --method POST "repos/$R/rulesets" --input "$E/strict-rule.json" > "$E/ruleset-created.json"
-   gh api "repos/$R/rulesets/$RULESET_ID" > "$E/ruleset-active.json"
-   gh api "repos/$R/rules/branches/integration%2Flifecycle-native-target" > "$E/effective-active.json"
-   ```
+   The repaired PR event capture and independent verification are useful evidence
+   for that specific event and identity mapping. They do not prove server-side
+   atomicity or a universal exact-base guarantee under concurrent updates. Testing
+   empty-base advances, alternate dispatch eligibility or concurrent queue routes
+   is needed only for an explicitly adopted contract that demands those stronger
+   guarantees. It is not a mandatory matrix for the ordinary delivery path.
 
-   Require the returned rules to match the payload including app ID and strictness;
-   a successful POST wrapper is insufficient. Do not replace a rejected app-bound
-   rule with an any-source check. Keep all original configuration for restoration.
-
-5. **Pass/fail and eligibility controls.** Under the active rule create distinct
-   fresh pass/fail PRs (fail has `control.outcomes.pull_request=fail`); preserve the exact failed
-   attempt and its exit-23 artifact. Submit a merge request for the failed PR and
-   require provider rejection plus unchanged target and `merged=false`, even while
-   another head or another check name is green. Then exercise the real eligible
-   success case. Retain the full native body/exit for each attempt:
-
-   ```sh
-   jq -n --arg sha "$H" '{sha:$sha,merge_method:"merge"}' > "$E/merge.json"
-   gh api --method PUT "repos/$R/pulls/$PR/merge" --input "$E/merge.json" > "$E/merge-result.json"
-   gh api "repos/$R/pulls/$PR" > "$E/pr-after.json"
-   git ls-remote origin "refs/heads/$TARGET"
-   ```
-
-   A successful merge must report `merged=true` and an actual merge SHA. Fetch it,
-   check first parent B, inclusion of H, and tree equality with tested M. Verify the
-   target contains the landing SHA, allowing a separately recorded subsequent
-   target advance. Any tree/base mismatch fails qualification; never call CLOSED
-   or `gh` exit zero a landing. Query a new target snapshot after the attempt.
-
-   For dispatch comparison, bind a dedicated ref H, then POST a payload
-   `{"ref":"feature/lifecycle-native-CASE-NN","inputs":{"candidate":"H",
-   "base":"B","base_ref":"refs/heads/integration/lifecycle-native-target",
-   "outcome":"pass"},"return_run_details":true}` to
-   `/repos/$R/actions/workflows/native-lifecycle.yml/dispatches`. Repeat with fail
-   on another fixed case/ref. Current API schema supports return_run_details;
-   capture the actual HTTP response and run ID, falling back only to explicit
-   identity-qualified run lookup if the response lacks details. Do not infer from
-   docs whether a dispatch check is required-check eligible. Observe actual server
-   admission, check app/head and failed-check rejection. Use a dedicated PR whose
-   PR control is failed, or a checked fast-forward proposal, to distinguish dispatch
-   eligibility from the presence of an eligible PR green. Dispatch alone is never
-   proof of PR coverage. Preserve rejected/unavailable arms as unresolved.
-
-6. **Head and base movement.** Prebind H, then fast-forward its case branch to H2
-   with a new case label. Submit the old `sha:H` merge payload and require explicit
-   head-mismatch rejection; retain both heads and both attempts. For base movement,
-   first finish a pass on B/H/M, then advance the target using a separately checked
-   change through the active rule. Immediately attempt the old checked PR and
-   require rejection until evidence binds the new B2. Old green or a new synthetic
-   merge tree with the same contents does not discharge the original base binding.
-
-   Repeat the base control with an **empty target advancement**: on a fresh
-   dedicated branch from B create an empty commit E (`git commit --allow-empty`),
-   verify `E^{tree} == B^{tree}` and `E != B`, obtain the actual required check on E,
-   then attempt ordinary fast-forward `git push origin E:refs/heads/$TARGET` under
-   the unchanged active rule. Use dispatch only if its eligibility was established;
-   otherwise try a native empty PR if GitHub admits it. Rejection/unavailability is
-   an evidence gap, not permission to bypass checks or weaken rules. Preserve the
-   exact accepted target SHA before retrying the stale-base merge. If empty
-   advancement cannot be exercised, the strict route remains unqualified.
-
-   **Direct merge has no expected-base argument in the inspected API schema.**
-   Fetch-then-merge is not atomic. A few rejection observations cannot prove a
-   universal exact-base guarantee. If native admission permits a stale bound base,
-   or the route lacks a demonstrated provider mechanism for that binding, stop
-   qualifying direct merge and proceed to the queue arm. Preserve any unexpected
-   experiment landing and its mismatch; never retroactively label it validated.
-
-7. **Qualify the real provider queue.** Public organization ownership is a documented
-   entitlement premise, not a measured capability. Strengthen only the new
-   experiment ruleset with `merge_queue`; keep its original required check, app,
-   strictness and bypass settings. Use the original create payload as input, not
-   a response object containing read-only API fields:
-
-   ```sh
-   jq '.rules += [{type:"merge_queue",parameters:{check_response_timeout_minutes:10,grouping_strategy:"ALLGREEN",max_entries_to_build:1,max_entries_to_merge:1,merge_method:"MERGE",min_entries_to_merge:1,min_entries_to_merge_wait_minutes:0}}]' "$E/strict-rule.json" > "$E/queue-rule.json"
-   gh api --method PUT "repos/$R/rulesets/$RULESET_ID" --input "$E/queue-rule.json" > "$E/queue-rule-result.json"
-   gh api "repos/$R/rules/branches/integration%2Flifecycle-native-target" > "$E/queue-effective.json"
-   jq -n --arg sha "$H" '{sha:$sha,merge_action:"merge_queue"}' > "$E/enqueue.json"
-   gh api --method PUT "repos/$R/pulls/$PR/merge-async" --input "$E/enqueue.json" > "$E/enqueue-result.json"
-   gh api "repos/$R/pulls/$PR/merge-async/$UUID" > "$E/enqueue-terminal.json"
-   ```
-
-   `202`/pending and `enqueued` are not merged. For an async request, retain UUID,
-   expected SHA and action, query only that UUID with a bounded 30-second cadence
-   (10-minute infrastructure deadline), and preserve every error/response. A 409
-   may identify a different pending request: do not adopt it without matching all
-   inputs. Async results expire after 24 hours. Once enqueued, use actual native
-   Actions run notification/watch plus PR/target queries for eventual landing;
-   the enqueue result itself never changes into a queue landing verdict.
-
-   Require a real `merge_group/checks_requested` run on this target, queue ref G,
-   exact group candidate/base and successful required check. Before artifact
-   review, independently query/fetch that queue ref and current target, freeze G,
-   B and trees, then apply `verify` and the same run/job/check/suite association.
-   If the queue moved before collection, retain the old result and bind a new run;
-   never silently replace its expected identity. Exercise head move rejection with
-   a stale `sha` enqueue request as well. A first single-entry queue green cannot
-   establish concurrent-base behavior: queue two independent PRs (for example a
-   case-label edit to `control.json` and a separate wording edit to this registered
-   README, both with pass controls), require the
-   second group's new base to contain the first landing, and reject reuse of its
-   pre-advance result. Repeat the empty-tree advancement arm through a queue PR if
-   GitHub admits an empty PR; if not, retain that precise limitation. A PR carrying
-   the fail control must never land. For a **group-only** failure, set
-   `control.outcomes.pull_request=pass` and `control.outcomes.merge_group=fail` on
-   a fresh candidate. Its real PR check can pass and admit it to the queue, where
-   the real group child must exit 23 and prevent landing. Do not fabricate a
-   successful check to enter the queue.
-
-   Finally fetch each landed SHA and require tested group-tree equality and the
-   exact group-base mapping. Record any provider commit-SHA rewriting with its
-   tree/parent proof. Missing queue settings, event, check association, rejection
-   or landing evidence stops the affected route. Do not replace the queue with a
-   custom scheduler, or silently fall back to unchecked direct merge.
-
-8. **Hand back and restore deliberately.** Preserve source branches, PRs, original
-   config, raw runs and failure artifacts. Before future restoration re-read the
-   exact new ruleset ID/name/condition/body; remove only that caller-created
-   experiment rule (`DELETE /repos/$R/rulesets/$RULESET_ID`) when its experiment
-   lifecycle is complete and caller-authorized. Verify original effective settings
-   remain intact. Never delete old branches or rewrite original results. This
-   document does not authorize the implementation worker to run any native write.
+5. **Retain useful results.** Keep the registered fixture and regression tests,
+   fixed identities, original native artifacts and actual verification outcomes.
+   Preserve existing repository rules. Only modify an experiment-specific rule
+   when the chosen route actually requires it and caller authorization covers the
+   change; the fixture creates no such rule automatically.
 
 ## SPEC 10 and the next implementation decision
 
@@ -368,14 +258,15 @@ and integration acceptance; CI owns transport; GitHub owns admission. Existing
 `crates/ci/src/full.rs` accepts full workflow_dispatch only. This fixture cannot
 turn that into product PR/merge_group support by declaration.
 
-After qualification, the smallest ordered sequence remains:
+The registered operational sequence is:
 
 1. Preserve old branch/index/work and original failed/partial reports. Establish
    that interrupted operations stopped; use the applicable registered recovery
    primitive without rewriting the original outcome.
-2. Fetch latest dev, start a **new** named fresh integration for rule/stability
-   changes. Supply reconstruct's fixed old base/candidate and complete carry/retire
-   plan. Reconcile changed/retired requirements and actual conflicts with current
+2. Observe current dev and the registered freshness limits. For a new rule/stability
+   task use fresh integration; reconstruct an existing task only when expiry,
+   conflicts or requirement changes call for it. Supply reconstruct's fixed old
+   base/candidate and complete carry/retire plan. Reconcile changed/retired requirements and actual conflicts with current
    source; do not merge an old branch merely to appear fresh. Recover the retained
    conflict result against the actual resolved index and keep the old work.
 3. Re-register the reconciled inputs, commit the resulting candidate and run the
@@ -384,11 +275,12 @@ After qualification, the smallest ordered sequence remains:
    integration reports are not reusable after their inputs change.
 4. If and only if the native experiment identifies a concrete missing product
    transport, extend the natural `ci` / dedicated `ci-tests` pair finitely to supply
-   that event's full context and bindings. No product crate is selected now. Full
-   input closure and actual full-host activation remain separate prerequisites.
-5. Caller opens the PR, associates exact required checks and submits the qualified
-   admission route. A changed base/candidate or merge-tree mismatch returns to fresh
-   reconciliation and exact checks. Confirm actual dev landing SHA/tree and base
+   that event's full context and bindings. No product crate is selected now. Actual full-host activation requires its declared input bindings and applicable
+   checks; it does not require proof that every possible hidden input is absent.
+5. Caller opens the PR, associates exact required checks and submits the registered
+   delivery route. A changed base/candidate or merge-tree mismatch requires
+   reconciliation and the affected checks; branch reconstruction follows the
+   registered freshness/conflict criteria. Confirm actual dev landing SHA/tree and base
    mapping plus required postconditions. A PR, CLOSED, green unrelated check or
    successful launcher never substitutes for landing evidence.
 
