@@ -1,0 +1,15 @@
+{
+  "repository": "ChronoAIProject/chrono-harness-examples-go",
+  "target_ref": "refs/heads/integration/lifecycle-native-target",
+  "dispatch_ref_prefix": "refs/heads/feature/lifecycle-native-",
+  "workflow_path": ".github/workflows/native-lifecycle.yml",
+  "workflow_source": ".chrono-harness/experiments/native-lifecycle/workflow.json",
+  "check_name": "native lifecycle / probe",
+  "artifact_prefix": "native-lifecycle",
+  "retention_days": 30,
+  "git_program": "git",
+  "process_timeout_seconds": 30,
+  "control_path": ".chrono-harness/experiments/native-lifecycle/control.json",
+  "run_local_root": ".chrono-harness/state/native-lifecycle/",
+  "scope": "Provider capability experiment only; no full-governance or delivery verdict."
+}

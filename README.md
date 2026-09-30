@@ -23,12 +23,14 @@ probe 的实际调用路径、解析目标、执行物前后摘要，以及原�
 
 ## 独立 workflow 与汇总
 
-每个登记单元各有独立 workflow、checkout、检查状态与重跑入口；全部工作流由同一配置生成。启动 SDK 由 `bootstrap.json` 的同名 profile 显式选择，不按语言或目录推断。上面的命令以一个单元为例，把 `--profile` 与 `--unit` 换成同一个登记 ID 即可。
+每个登记单元各有独立 workflow、checkout、检查状态与重跑入口；这些单元与汇总工作流由同一配置生成。启动 SDK 由 `bootstrap.json` 的同名 profile 显式选择，不按语言或目录推断。上面的命令以一个单元为例，把 `--profile` 与 `--unit` 换成同一个登记 ID 即可。
 
 | 单元 ID | 完整测试计划 | Workflow |
 |---|---|---|
 | `rates` | `test:rates-tests` | `.github/workflows/chrono-ci-rates.yml` |
-| `harness` | `test:bootstrap-tests` | `.github/workflows/chrono-ci-harness.yml` |
+| `harness` | `test:bootstrap-tests`, `test:native-lifecycle-tests` | `.github/workflows/chrono-ci-harness.yml` |
+
+[原生生命周期实验](.chrono-harness/experiments/native-lifecycle/README.md) 另行显式登记专用 provider fixture，只对实验目标分支自动触发。它不属于通用 CI 生成器，不代表完整治理或原生交付已验证；脚本行为测试仍通过上面的 `harness` 单元执行。
 
 `chrono / collection` 等待并下载同一候选、事件和基线的各单元原始结果，然后用与本地相同的命令判定完整性：
 

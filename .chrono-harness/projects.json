@@ -6,7 +6,9 @@
     "bootstrap",
     "bootstrap-tests",
     "rates",
-    "rates-tests"
+    "rates-tests",
+    "native-lifecycle",
+    "native-lifecycle-tests"
   ],
   "projects": [
     {
@@ -95,6 +97,75 @@
           "argv": [
             "-B",
             ".chrono-harness/bootstrap_test.py"
+          ]
+        }
+      }
+    },
+    {
+      "id": "native-lifecycle",
+      "path": ".chrono-harness/experiments/native-lifecycle/probe.py",
+      "test_script": "native-lifecycle-tests",
+      "actions": {
+        "capture": {
+          "operation": "native.capture",
+          "tool": "python3",
+          "argv": [
+            "-B",
+            ".chrono-harness/experiments/native-lifecycle/probe.py",
+            "capture",
+            "--repo-dir",
+            "{repo}",
+            "--event",
+            "{event}",
+            "--context",
+            "{context}",
+            "--output",
+            "{output}"
+          ]
+        },
+        "verify": {
+          "operation": "native.verify",
+          "tool": "python3",
+          "argv": [
+            "-B",
+            ".chrono-harness/experiments/native-lifecycle/probe.py",
+            "verify",
+            "--repo-dir",
+            "{repo}",
+            "--event",
+            "{event}",
+            "--context",
+            "{context}",
+            "--expect",
+            "{expect}",
+            "--output",
+            "{output}"
+          ]
+        },
+        "project": {
+          "operation": "native.project",
+          "tool": "python3",
+          "argv": [
+            "-B",
+            ".chrono-harness/experiments/native-lifecycle/probe.py",
+            "project",
+            "--host-root",
+            "."
+          ]
+        }
+      }
+    },
+    {
+      "id": "native-lifecycle-tests",
+      "path": ".chrono-harness/experiments/native-lifecycle/probe_test.py",
+      "tests_for": "native-lifecycle",
+      "actions": {
+        "execute": {
+          "operation": "test.native-lifecycle",
+          "tool": "python3",
+          "argv": [
+            "-B",
+            ".chrono-harness/experiments/native-lifecycle/probe_test.py"
           ]
         }
       }

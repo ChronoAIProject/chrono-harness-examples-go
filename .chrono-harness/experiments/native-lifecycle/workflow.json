@@ -1,0 +1,101 @@
+{
+  "name": "native lifecycle provider experiment",
+  "on": {
+    "pull_request": {
+      "branches": [
+        "integration/lifecycle-native-target"
+      ],
+      "types": [
+        "opened",
+        "synchronize",
+        "reopened"
+      ]
+    },
+    "merge_group": {
+      "branches": [
+        "integration/lifecycle-native-target"
+      ],
+      "types": [
+        "checks_requested"
+      ]
+    },
+    "workflow_dispatch": {
+      "inputs": {
+        "candidate": {
+          "description": "Expected dispatch ref commit, full SHA",
+          "required": true,
+          "type": "string"
+        },
+        "base": {
+          "description": "Independently fixed target base commit, full SHA",
+          "required": true,
+          "type": "string"
+        },
+        "base_ref": {
+          "description": "Dedicated experiment target ref",
+          "required": true,
+          "type": "string",
+          "default": "refs/heads/integration/lifecycle-native-target"
+        },
+        "outcome": {
+          "description": "Real child operation result",
+          "required": true,
+          "type": "choice",
+          "options": [
+            "pass",
+            "fail"
+          ],
+          "default": "pass"
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "probe": {
+      "name": "native lifecycle / probe",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "steps": [
+        {
+          "name": "Retain original event before checkout",
+          "shell": "bash",
+          "run": "python3 - <<'PYCODE'\nimport json, os\nfrom pathlib import Path\nout = Path(os.environ['NATIVE_ARTIFACT_ROOT'])\nout.mkdir(parents=True, exist_ok=False)\n(out / 'event.json').write_bytes(Path(os.environ['GITHUB_EVENT_PATH']).read_bytes())\nkeys = {'event':'GITHUB_EVENT_NAME', 'repository':'GITHUB_REPOSITORY',\n        'ref':'GITHUB_REF', 'candidate':'GITHUB_SHA', 'run_id':'GITHUB_RUN_ID',\n        'run_attempt':'GITHUB_RUN_ATTEMPT', 'workflow_ref':'GITHUB_WORKFLOW_REF',\n        'workflow_sha':'GITHUB_WORKFLOW_SHA'}\n(out / 'context.json').write_text(json.dumps({key:os.environ[value] for key,value in keys.items()}, indent=2) + '\\n')\nPYCODE\n",
+          "env": {
+            "NATIVE_ARTIFACT_ROOT": "${{ runner.temp }}/native-lifecycle/${{ github.run_id }}/${{ github.run_attempt }}"
+          }
+        },
+        {
+          "name": "Check out transport candidate",
+          "uses": "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "fetch-depth": 0,
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Measure event and run controlled operation",
+          "shell": "bash",
+          "run": "python3 -B .chrono-harness/experiments/native-lifecycle/probe.py capture --repo-dir . --event \"$NATIVE_ARTIFACT_ROOT/event.json\" --context \"$NATIVE_ARTIFACT_ROOT/context.json\" --output \"$NATIVE_ARTIFACT_ROOT/measurement\"\n",
+          "env": {
+            "NATIVE_ARTIFACT_ROOT": "${{ runner.temp }}/native-lifecycle/${{ github.run_id }}/${{ github.run_attempt }}"
+          }
+        },
+        {
+          "name": "Retain original success or failure",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "native-lifecycle-${{ github.run_id }}-${{ github.run_attempt }}",
+            "path": "${{ runner.temp }}/native-lifecycle/${{ github.run_id }}/${{ github.run_attempt }}",
+            "if-no-files-found": "error",
+            "retention-days": 30
+          }
+        }
+      ]
+    }
+  }
+}

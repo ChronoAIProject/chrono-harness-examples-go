@@ -58,7 +58,8 @@
       },
       "harness": {
         "tests": [
-          "test:bootstrap-tests"
+          "test:bootstrap-tests",
+          "test:native-lifecycle-tests"
         ],
         "report_path": ".chrono-harness/state/units/harness/check.json"
       }
