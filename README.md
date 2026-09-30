@@ -15,6 +15,12 @@ python3 .chrono-harness/bootstrap.py . --profile rates
 
 候选必须是当前干净提交。首个无父提交使用 `--initial --candidate <SHA>`，代替 `--base`。单元报告由工具写入 `.chrono-harness/state/units/<单元ID>/check.json`。CI 的检测步骤使用完全相同的 harness argv；平台和 SDK 读数由 bootstrap-result.json 记录，指令相同不宣称环境完全等价。
 
+每个 profile 明确选择 Git 版本探测。`bootstrap-result.json` 的 `tools` 记录所选
+probe 的实际调用路径、解析目标、执行物前后摘要，以及原始输出、摘要和退出码；
+探测失败或执行物改变时保留失败结果并退出非零。调用别名保留，不因采集身份而改用
+目标文件名。这里的 `passed` 只表示启动与所选探测成功，不是 harness 检查或完整
+输入闭包的判词。这些读数供 AI 显式更新工具登记，程序不自动接受新版本或改写配置。
+
 ## 独立 workflow 与汇总
 
 每个登记单元各有独立 workflow、checkout、检查状态与重跑入口；全部工作流由同一配置生成。启动 SDK 由 `bootstrap.json` 的同名 profile 显式选择，不按语言或目录推断。上面的命令以一个单元为例，把 `--profile` 与 `--unit` 换成同一个登记 ID 即可。
