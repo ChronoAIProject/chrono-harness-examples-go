@@ -42,6 +42,19 @@ class Distribution(unittest.TestCase):
             self.assertEqual(observed['stdout'],str(alias))
             self.assertEqual(observed['resolved_path'],str(program.resolve()))
 
+    def test_probe_alias_loop_keeps_the_completed_child_result(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            program=root/'actual-tool'
+            program.write_text('#!/bin/sh\n/bin/rm "$0"\n/bin/ln -s registered-alias "$0"\nprintf original\nexit 17\n')
+            program.chmod(0o755)
+            (root/'registered-alias').symlink_to(program.name)
+            observed=bootstrap.observe_probe(root,['./registered-alias'])
+            self.assertEqual(observed['status'],'failed')
+            self.assertEqual(observed['exit_code'],17)
+            self.assertEqual(observed['stdout'],'original')
+            self.assertTrue(any('executable identity unavailable' in error for error in observed['errors']))
+
     def test_profile_failure_publishes_original_probe_evidence(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);cfg=self.fixture(root)

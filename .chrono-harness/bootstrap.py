@@ -73,7 +73,7 @@ def observe_probe(root, argv):
         after=hashlib.sha256(program.read_bytes()).hexdigest()
         if selected.resolve(strict=True)!=program or before!=after:
             errors.append('executable changed')
-    except OSError as error:
+    except (OSError, RuntimeError) as error:
         errors.append('executable identity unavailable: '+str(error))
     if child.returncode:
         errors.append('probe exit '+str(child.returncode))
