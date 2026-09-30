@@ -64,6 +64,10 @@
       }
     },
     "shared_operations": {},
-    "facts_config": ".chrono-harness/git/platforms.json"
+    "facts_config": ".chrono-harness/git/platforms.json",
+    "collection_limits": {
+      "manifest_bytes": 1048576,
+      "report_bytes": 67108864
+    }
   }
 }
