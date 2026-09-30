@@ -24,6 +24,10 @@
     "go": [
       ".chrono-harness/cache/sdk/go/go/bin/go",
       "version"
+    ],
+    "git": [
+      "git",
+      "--version"
     ]
   },
   "default_profile": "all",
@@ -34,19 +38,22 @@
       ],
       "probes": [
         "harness",
-        "go"
+        "go",
+        "git"
       ]
     },
     "harness": {
       "downloads": [],
       "probes": [
-        "harness"
+        "harness",
+        "git"
       ]
     },
     "collection": {
       "downloads": [],
       "probes": [
-        "harness"
+        "harness",
+        "git"
       ]
     },
     "rates": {
@@ -55,7 +62,8 @@
       ],
       "probes": [
         "harness",
-        "go"
+        "go",
+        "git"
       ]
     }
   }

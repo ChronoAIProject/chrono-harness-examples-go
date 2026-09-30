@@ -6,6 +6,67 @@ spec=importlib.util.spec_from_file_location('bootstrap',Path(__file__).with_name
 bootstrap=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bootstrap)
 class Distribution(unittest.TestCase):
+    def test_probe_retains_executable_identity_and_original_failure(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            argv=[sys.executable,'-c','import sys;print("version");print("failure",file=sys.stderr);sys.exit(17)']
+            observed=bootstrap.observe_probe(root,argv)
+            self.assertEqual(observed['exit_code'],17)
+            self.assertEqual(observed['stdout'],'version\n')
+            self.assertEqual(observed['stderr'],'failure\n')
+            self.assertEqual(observed['sha256'],hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest())
+            self.assertEqual(observed['stdout_sha256'],hashlib.sha256(b'version\n').hexdigest())
+            self.assertEqual(observed['status'],'failed')
+
+    def test_probe_detects_mutation_without_losing_child_result(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            program=root/'version tool'
+            program.write_text('#!/bin/sh\nprintf "# changed\\n" >> "$0"\nprintf original\nexit 17\n')
+            program.chmod(0o755)
+            observed=bootstrap.observe_probe(root,['./version tool'])
+            self.assertEqual(observed['exit_code'],17)
+            self.assertEqual(observed['stdout'],'original')
+            self.assertNotEqual(observed['sha256'],observed['after_sha256'])
+            self.assertIn('executable changed',observed['errors'])
+
+    def test_probe_preserves_registered_alias_invocation(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            program=root/'actual-tool'
+            program.write_text('#!/bin/sh\nprintf "%s" "$0"\n')
+            program.chmod(0o755)
+            alias=root/'registered-alias'
+            alias.symlink_to(program.name)
+            observed=bootstrap.observe_probe(root,['./registered-alias'])
+            self.assertEqual(observed['stdout'],str(alias))
+            self.assertEqual(observed['resolved_path'],str(program.resolve()))
+
+    def test_probe_alias_loop_keeps_the_completed_child_result(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            program=root/'actual-tool'
+            program.write_text('#!/bin/sh\n/bin/rm "$0"\n/bin/ln -s registered-alias "$0"\nprintf original\nexit 17\n')
+            program.chmod(0o755)
+            (root/'registered-alias').symlink_to(program.name)
+            observed=bootstrap.observe_probe(root,['./registered-alias'])
+            self.assertEqual(observed['status'],'failed')
+            self.assertEqual(observed['exit_code'],17)
+            self.assertEqual(observed['stdout'],'original')
+            self.assertTrue(any('executable identity unavailable' in error for error in observed['errors']))
+
+    def test_profile_failure_publishes_original_probe_evidence(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);cfg=self.fixture(root)
+            cfg['probes']['selected']=[sys.executable,'-c','import sys;print("original");sys.exit(17)']
+            result=self.run_profile(cfg,root)
+            self.assertNotEqual(result.returncode,0)
+            report=json.loads((root/'.chrono-harness/state/bootstrap-result.json').read_text())
+            self.assertEqual(report['status'],'failed')
+            self.assertEqual(report['tools']['selected']['exit_code'],17)
+            self.assertEqual(report['tools']['selected']['stdout'],'original\n')
+            self.assertEqual(report['versions'],{})
+
     def test_instruction_projection_matches_registered_sources(self):
         root=Path(__file__).resolve().parent.parent
         sources=['.chrono-harness/instructions/catalog.json','.chrono-harness/instructions/manifest.json','.chrono-harness/instructions/host-context.md','CLAUDE.md']
@@ -61,6 +122,9 @@ class Distribution(unittest.TestCase):
             self.assertEqual(report['profile'],'unit')
             self.assertEqual(report['downloads'],['needed'])
             self.assertEqual(report['versions'],{'selected':'selected-sdk'})
+            self.assertEqual(report['status'],'passed')
+            self.assertEqual(set(report['tools']),{'selected'})
+            self.assertEqual(report['tools']['selected']['status'],'passed')
     def test_profile_invalid_references_fail_before_installation(self):
         for case in ['unknown-profile','missing-download','missing-probe','duplicate-selection','duplicate-download']:
             with self.subTest(case=case),tempfile.TemporaryDirectory() as d:

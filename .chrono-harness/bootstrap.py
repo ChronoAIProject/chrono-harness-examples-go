@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Install pinned harness tools and SDKs from the selected explicit host profile."""
-import argparse, base64, hashlib, io, json, platform, shutil, subprocess, sys, tarfile, urllib.request
+import argparse, base64, hashlib, io, json, os, platform, shutil, subprocess, sys, tarfile, urllib.request
 from pathlib import Path
 
 def verified(data, integrity):
@@ -53,6 +53,44 @@ def selection(cfg, requested):
     profile = profiles[name]
     return name, [downloads[key] for key in profile['downloads']], {key: cfg['probes'][key] for key in profile['probes']}
 
+def observe_probe(root, argv):
+    """Observe only an explicitly selected command; never update expected identities."""
+    if not isinstance(argv,list) or not argv or any(not isinstance(arg,str) for arg in argv) or not argv[0]:
+        raise ValueError('invalid registered probe argv')
+    if '/' in argv[0]:
+        selected=root/argv[0]
+    else:
+        selected=next((root/entry/argv[0] for entry in os.get_exec_path()
+                       if (root/entry/argv[0]).is_file() and os.access(root/entry/argv[0],os.X_OK)),None)
+        if selected is None:
+            raise ValueError('registered probe executable missing: '+argv[0])
+    program=selected.resolve(strict=True)
+    before=hashlib.sha256(program.read_bytes()).hexdigest()
+    child=subprocess.run([str(selected),*argv[1:]],cwd=root,capture_output=True)
+    errors=[]
+    after=None
+    try:
+        after=hashlib.sha256(program.read_bytes()).hexdigest()
+        if selected.resolve(strict=True)!=program or before!=after:
+            errors.append('executable changed')
+    except (OSError, RuntimeError) as error:
+        errors.append('executable identity unavailable: '+str(error))
+    if child.returncode:
+        errors.append('probe exit '+str(child.returncode))
+    streams={}
+    for key,data in [('stdout',child.stdout),('stderr',child.stderr)]:
+        streams[key+'_base64']=base64.b64encode(data).decode('ascii')
+        streams[key+'_sha256']=hashlib.sha256(data).hexdigest()
+        try:
+            streams[key]=data.decode('utf-8')
+        except UnicodeDecodeError:
+            streams[key]=None
+            errors.append('non-UTF-8 '+key)
+    return {'scope':'executable-and-version-only','requested_argv':argv,
+            'argv':[str(selected),*argv[1:]],'path':str(selected),'resolved_path':str(program),'sha256':before,
+            'after_sha256':after,'exit_code':child.returncode,**streams,
+            'status':'failed' if errors else 'passed','errors':errors}
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('host', type=Path)
@@ -84,11 +122,21 @@ def main():
     for source_path, destination in installed:
         destination.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(source_path,destination)
-    versions = {}
-    for key, argv in probes.items():
-        versions[key] = subprocess.check_output(argv,cwd=root,text=True).strip()
-    (state / 'bootstrap-result.json').write_text(json.dumps({'profile':profile,'downloads':[item['id'] for item in downloads],'release_version':distribution['version'],'source_revision':distribution['source_commit'],'versions':versions,'harness_installed':distribution['installed'],'installed':[{'path':str(dst.relative_to(root)),'sha256':hashlib.sha256(dst.read_bytes()).hexdigest()} for _,dst in installed]},indent=2)+'\n')
-    print(json.dumps(versions))
+    report={'profile':profile,'downloads':[item['id'] for item in downloads],
+            'release_version':distribution['version'],'source_revision':distribution['source_commit'],
+            'versions':{},'tools':{},'status':'failed','harness_installed':distribution['installed'],
+            'installed':[{'path':str(dst.relative_to(root)),'sha256':hashlib.sha256(dst.read_bytes()).hexdigest()} for _,dst in installed]}
+    try:
+        for key, argv in probes.items():
+            observed=observe_probe(root,argv)
+            report['tools'][key]=observed
+            if observed['status']!='passed':
+                raise ValueError('registered probe failed: '+key+': '+', '.join(observed['errors']))
+            report['versions'][key]=observed['stdout'].strip()
+        report['status']='passed'
+    finally:
+        (state / 'bootstrap-result.json').write_text(json.dumps(report,indent=2)+'\n')
+    print(json.dumps(report['versions']))
 
 if __name__ == '__main__':
     main()
