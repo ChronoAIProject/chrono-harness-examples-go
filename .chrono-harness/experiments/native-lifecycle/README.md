@@ -78,6 +78,25 @@ ran successfully. It does not choose an expected identity or attest admission.
 `verify` takes the original event/context plus a **separately prepared** expected
 JSON object. Do not populate that object from the artifact being verified.
 
+For `pull_request`, the tested candidate is the Actions transport `GITHUB_SHA`
+(`github.sha`) on `GITHUB_REF=refs/pull/NUMBER/merge`, as specified by
+[GitHub's PR event contract](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request).
+The payload's `pull_request.merge_commit_sha` is advisory mergeability metadata,
+not a second candidate authority. GitHub [computes mergeability in the background](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request);
+its [PR schema](https://github.com/github/rest-api-description/blob/main/descriptions/api.github.com/api.github.com.json)
+requires the field but permits null. The fixture accepts null or a well-formed
+SHA differing from the transport, preserving the original field unchanged in the
+copied event. Missing or malformed metadata still rejects. A differing SHA never
+replaces the transport candidate, base/head or independent expectations.
+
+Acceptance still requires the transport candidate's actual ordered Git parents
+to equal the event base/head, complete ancestry and commit objects; `capture`
+also requires checkout HEAD to equal that candidate. `verify` binds these values,
+trees, repository, event/ref, run/attempt and workflow identity to the independent
+expectations below. A local regression pass does not repair an earlier native
+failure: after committing and checking the correction, the caller must run a
+fresh native source/case and retain the original failed artifacts.
+
 ```json
 {
   "event": "pull_request",

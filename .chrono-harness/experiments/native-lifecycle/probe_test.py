@@ -92,7 +92,90 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(result["git"]["parents"], [self.base, self.head])
         self.assertEqual((case / "out/event.json").read_bytes(), raw)
 
+    def assert_pr_capture_and_verify(self):
+        raw = json.dumps(self.event, indent=3).encode() + b"\n\n"
+        expected = copy.deepcopy(self.expected)
+        for mode in ("capture", "verify"):
+            with self.subTest(mode=mode):
+                child, result, case = self.run_probe(mode, event_bytes=raw)
+                self.assertEqual(child.returncode, 0, result)
+                self.assertEqual(result["exit_code"], 0)
+                self.assertEqual(result["errors"], [])
+                self.assertEqual(result["observed"]["candidate"], self.merge)
+                self.assertEqual(result["git"]["parents"], [self.base, self.head])
+                self.assertEqual(result["git"]["candidate_tree"], self.tree)
+                self.assertEqual(result["git"]["base_ancestor_exit"], 0)
+                self.assertEqual((case / "out/event.json").read_bytes(), raw)
+                if mode == "capture":
+                    self.assertEqual(result["git"]["checkout_head"], self.merge)
+                    self.assertEqual(result["controlled_exit"], 0)
+                else:
+                    self.assertEqual(json.loads((case / "out/expect.json").read_bytes()), expected)
+
+    def test_pr_opened_null_merge_sha_capture_and_verify(self):
+        # Minimal representative of the native opened event; expectations are
+        # fixed from the independently constructed Git objects in setUp.
+        self.event["pull_request"]["merge_commit_sha"] = None
+        self.assert_pr_capture_and_verify()
+
+    def test_pr_stale_merge_metadata_capture_and_verify(self):
+        stale = self.commit(self.base_tree, "previous merge", self.base, self.other)
+        for action in ("opened", "synchronize", "reopened"):
+            with self.subTest(action=action):
+                self.event["action"] = action
+                self.event["pull_request"]["merge_commit_sha"] = stale
+                self.assert_pr_capture_and_verify()
+
+    def assert_pr_rejects(self, error):
+        for mode in ("capture", "verify"):
+            with self.subTest(mode=mode):
+                child, result, case = self.run_probe(mode)
+                self.assertEqual(child.returncode, 1, result)
+                self.assertEqual(result["exit_code"], 1)
+                self.assertIn(error, result["errors"])
+                self.assertIsNone(result["controlled_exit"])
+                self.assertEqual((case / "out/event.json").read_bytes(), (case / "event.json").read_bytes())
+
+    def test_pr_merge_metadata_shape_still_required(self):
+        for invalid in ("not-a-sha", 123, {}, []):
+            with self.subTest(value=invalid):
+                self.event["pull_request"]["merge_commit_sha"] = invalid
+                self.assert_pr_rejects("event merge metadata must be null or a full Git SHA-1")
+        del self.event["pull_request"]["merge_commit_sha"]
+        self.assert_pr_rejects("'merge_commit_sha'")
+
+    def test_pr_null_metadata_wrong_transport_rejects(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
+        self.context["candidate"] = self.head
+        self.assert_pr_rejects("PR merge parents differ from bound base/head")
+        self.context["candidate"] = self.merge
+        self.context["ref"] = "refs/pull/8/merge"
+        self.assert_pr_rejects("pull_request ref/number mismatch")
+
+    def test_pr_null_metadata_wrong_base_head_and_parents_reject(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
+        for side, wrong in (("base", self.head), ("head", self.base)):
+            with self.subTest(side=side):
+                self.event["pull_request"][side]["sha"] = wrong
+                self.assert_pr_rejects("PR merge parents differ from bound base/head")
+                self.event["pull_request"][side]["sha"] = getattr(self, side)
+        for parents in ((self.head, self.base), (self.base, self.other), (self.base,)):
+            with self.subTest(parents=parents):
+                wrong = self.commit(self.tree, "wrong merge parents", *parents)
+                self.context["candidate"] = wrong
+                self.git("update-ref", "HEAD", wrong)
+                self.assert_pr_rejects("PR merge parents differ from bound base/head")
+
+    def test_pr_null_metadata_requires_commit_objects_and_complete_history(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
+        self.context["candidate"] = self.tree
+        self.assert_pr_rejects("candidate is not a commit object")
+        self.context["candidate"] = self.merge
+        (self.repo / ".git/shallow").write_text(self.base + "\n")
+        self.assert_pr_rejects("complete Git ancestry required; shallow repository")
+
     def test_independent_expected_identities_reject_mismatch(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
         wrong = {"candidate": self.head, "base": self.other, "head": self.other,
                  "event": "workflow_dispatch", "repository": "wrong/repo",
                  "ref": "refs/heads/dev", "base_ref": "refs/heads/dev",
@@ -113,7 +196,8 @@ class ProbeTests(unittest.TestCase):
             with self.subTest(field=field):
                 self.event = copy.deepcopy(original)
                 if field == "candidate":
-                    self.event["pull_request"]["merge_commit_sha"] = self.head
+                    # The tested candidate belongs to the Actions transport.
+                    self.context["candidate"] = self.head
                 elif field == "base":
                     self.event["pull_request"]["base"]["sha"] = self.other
                 elif field == "target":
@@ -123,6 +207,7 @@ class ProbeTests(unittest.TestCase):
                 child, result, _ = self.run_probe()
                 self.assertEqual(child.returncode, 1)
                 self.assertTrue(result["errors"])
+                self.context["candidate"] = self.merge
 
     def test_merge_group_positive_and_nonancestor_base_reject(self):
         self.event = {"action": "checks_requested", "repository": self.event["repository"],
@@ -153,6 +238,7 @@ class ProbeTests(unittest.TestCase):
         self.assertTrue(any("dispatch ref" in e for e in result["errors"]))
 
     def test_controlled_failure_keeps_original_subprocess_result(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
         self.control["outcomes"]["pull_request"] = "fail"
         child, result, case = self.run_probe("capture")
         self.assertEqual(child.returncode, 23, result)
@@ -163,6 +249,7 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(result["controlled_exit"], 23)
 
     def test_capture_pass_and_checkout_mismatch(self):
+        self.event["pull_request"]["merge_commit_sha"] = None
         child, result, _ = self.run_probe("capture")
         self.assertEqual(child.returncode, 0, result)
         self.git("update-ref", "HEAD", self.head)

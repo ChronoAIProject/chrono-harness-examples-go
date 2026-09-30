@@ -96,8 +96,12 @@ def identities(event, context, policy):
             raise ValueError("pull_request ref/number mismatch")
         if any(pr[side]["repo"]["full_name"] != policy["repository"] for side in ("base", "head")):
             raise ValueError("experiment requires same-repository PR")
-        if pr["merge_commit_sha"] != context["candidate"]:
-            raise ValueError("event merge candidate differs from transport candidate")
+        # Actions GITHUB_SHA binds the tested merge candidate. PR merge metadata
+        # is asynchronous and may be null or describe another test merge; keep
+        # its raw bytes, but bind acceptance to Git parents and independent expect.
+        merge_metadata = pr["merge_commit_sha"]
+        if merge_metadata is not None and (not isinstance(merge_metadata, str) or not OID.fullmatch(merge_metadata)):
+            raise ValueError("event merge metadata must be null or a full Git SHA-1")
         base, base_ref, head = pr["base"]["sha"], "refs/heads/" + pr["base"]["ref"], pr["head"]["sha"]
     elif name == "merge_group":
         if event["action"] != "checks_requested":
