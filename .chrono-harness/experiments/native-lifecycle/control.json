@@ -1,5 +1,5 @@
 {
-  "case": "baseline",
+  "case": "pass-02-null-metadata-repair",
   "outcomes": {
     "pull_request": "pass",
     "merge_group": "pass",
