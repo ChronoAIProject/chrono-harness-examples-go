@@ -1,5 +1,5 @@
 {
-  "schema": "chrono-worktree-config/v1",
+  "schema": "chrono-worktree-config/v2",
   "host_config": ".chrono-harness/config.json",
   "remote": "origin",
   "git": {
@@ -19,5 +19,14 @@
   },
   "timeout_seconds": 120,
   "output_limit_bytes": 1048576,
-  "report_directory": ".chrono-harness/state/worktrees/"
+  "report_directory": ".chrono-harness/state/worktrees/",
+  "check_inputs": {
+    "origin_path": ".chrono-harness/state/origin.json",
+    "context_path": ".chrono-harness/state/local/context.json",
+    "collection_manifest": ".chrono-harness/state/collection/manifest.json",
+    "roles": {
+      "feature": "integration",
+      "integration": "integration"
+    }
+  }
 }
