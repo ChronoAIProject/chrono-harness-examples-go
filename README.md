@@ -66,6 +66,17 @@ The pinned release also installs `chrono-worktree`. The host policy is
 `feature/`, `integration/`, file ownership and artifacts. Project and FILEMAP
 registrations have one owner; directory names and languages do not select work.
 
+With a compatible public release, the v2 policy publishes the finalized original
+creation/reconstruction report and `.chrono-harness/state/origin.json` in each new
+destination. Both branch kinds use the `integration` check role; local context
+and collection manifest paths are
+`.chrono-harness/state/local/context.json` and
+`.chrono-harness/state/collection/manifest.json`. The policy must be committed in
+both the source and target `dev` before starting a lane. The pinned beta.19
+`chrono-worktree` rejects v2 `check_inputs`; a compatible public release is also
+required before worktree operations. Full short-command checks require separate
+full-host activation.
+
 ```sh
 .chrono-harness/bin/chrono-worktree start --host-root . --config .chrono-harness/worktree.json --kind feature --name change --path ../my-change
 ```
