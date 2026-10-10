@@ -1,17 +1,100 @@
 {
-  "schema_version": 3,
-  "facts_git": {
-    "tool": "facts-git",
-    "input": "facts-git-executable",
-    "guard": {
-      "schema": "chrono-git-inputs/v1",
-      "inputs": [
-        "facts-global-config",
-        "facts-local-include"
-      ]
+  "schema_version": 4,
+  "status": "proposed",
+  "enforcement": "not-implemented",
+  "runner": {
+    "path": ".chrono-harness/bin/chrono-harness",
+    "version": "0.1.0",
+    "sha256": null
+  },
+  "registries": {
+    "judges": ".chrono-harness/judges.json",
+    "projects": ".chrono-harness/projects.json",
+    "filemap": ".chrono-harness/FILEMAP.json",
+    "workflow": ".chrono-harness/workflow.json"
+  },
+  "canonical_check": {
+    "operation": "validate.delta",
+    "argv": [
+      ".chrono-harness/bin/chrono-harness",
+      "check"
+    ],
+    "profile": ".chrono-harness/ci/check.json",
+    "inputs": {
+      "local": {
+        "operation": "prepare.check.local",
+        "tool": "chrono-worktree",
+        "argv": [
+          "check-inputs",
+          "--config",
+          ".chrono-harness/worktree.json"
+        ]
+      },
+      "ci": {
+        "operation": "prepare.check.ci",
+        "tool": "chrono-ci",
+        "argv": [
+          "check-inputs",
+          "--config",
+          ".chrono-harness/ci/units.json",
+          "--event-env",
+          "GITHUB_EVENT_NAME",
+          "--payload-env",
+          "GITHUB_EVENT_PATH",
+          "--revision-env",
+          "CHRONO_WORKFLOW_REVISION",
+          "--repository-env",
+          "GITHUB_REPOSITORY"
+        ]
+      }
     }
   },
   "tools": [
+    {
+      "id": "python3",
+      "program": "python3",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-ci",
+      "program": ".chrono-harness/bin/chrono-ci",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-instructions",
+      "program": ".chrono-harness/bin/chrono-instructions",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "go",
+      "program": ".chrono-harness/cache/sdk/go/go/bin/go",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-worktree",
+      "program": ".chrono-harness/bin/chrono-worktree",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": "chrono-worktree 0.1.0"
+    },
     {
       "id": "facts-git",
       "program": "/usr/bin/git",
@@ -22,10 +105,55 @@
       "expected_version": "git version 2.55.0"
     }
   ],
+  "protocol": {
+    "id": "chrono-judge/v1",
+    "timeout_seconds": 2400,
+    "stdout_limit_bytes": 1048576,
+    "encoding": "UTF-8"
+  },
+  "semantic_fields": [],
+  "artifacts": [
+    {
+      "path": ".chrono-harness/bin/",
+      "owner": "repository",
+      "kind": "executable",
+      "tracked": false
+    },
+    {
+      "path": ".chrono-harness/state/",
+      "owner": "repository",
+      "kind": "evidence",
+      "tracked": false
+    },
+    {
+      "path": ".chrono-harness/cache/",
+      "owner": "repository",
+      "kind": "download-cache",
+      "tracked": false
+    }
+  ],
   "environment": {
-    "inherit": [],
+    "inherit": [
+      "PATH",
+      "HOME",
+      "CHRONO_CHECK_SOURCE",
+      "GITHUB_EVENT_NAME",
+      "GITHUB_EVENT_PATH",
+      "CHRONO_WORKFLOW_REVISION",
+      "GITHUB_REPOSITORY",
+      "GH_TOKEN",
+      "SSH_AUTH_SOCK",
+      "CHRONO_CI_DETECTION",
+      "CHRONO_CI_NEEDS",
+      "GITHUB_RUN_ID",
+      "GITHUB_RUN_ATTEMPT",
+      "GITHUB_JOB"
+    ],
     "values": {
-      "PATH": "/usr/bin:/bin",
+      "GOTOOLCHAIN": "local",
+      "GOWORK": "off",
+      "GOPROXY": "off",
+      "PYTHONDONTWRITEBYTECODE": "1",
       "LC_ALL": "C",
       "GIT_CONFIG_NOSYSTEM": "1",
       "GIT_CONFIG_GLOBAL": ".chrono-harness/git/global.config",
@@ -49,10 +177,26 @@
         "location": ".chrono-harness/git/local.config",
         "presence": "absent"
       }
+    ],
+    "credential_environment": [
+      "GH_TOKEN"
     ]
   },
-  "protocol": {
-    "timeout_seconds": 120,
-    "stdout_limit_bytes": 1048576
+  "input_closure": {
+    "status": "incomplete",
+    "unresolved": [
+      "Bootstrap provenance, complete effective inputs and governance activation are not certified."
+    ]
+  },
+  "facts_git": {
+    "tool": "facts-git",
+    "input": "facts-git-executable",
+    "guard": {
+      "schema": "chrono-git-inputs/v1",
+      "inputs": [
+        "facts-global-config",
+        "facts-local-include"
+      ]
+    }
   }
 }

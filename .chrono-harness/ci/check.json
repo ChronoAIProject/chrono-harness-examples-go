@@ -33,8 +33,6 @@
       ".chrono-harness/judges.json",
       ".chrono-harness/workflow.json",
       ".chrono-harness/worktree.json",
-      ".github/workflows/chrono-ci-rates.yml",
-      ".github/workflows/chrono-ci-harness.yml",
       ".chrono-harness/git/platforms.json",
       ".chrono-harness/git/macos.json",
       ".chrono-harness/git/linux.json",
@@ -64,10 +62,11 @@
       }
     },
     "shared_operations": {},
-    "facts_config": ".chrono-harness/git/platforms.json",
+    "facts_config": ".chrono-harness/config.json",
     "collection_limits": {
       "manifest_bytes": 1048576,
       "report_bytes": 67108864
-    }
+    },
+    "registration_config": ".chrono-harness/config.json"
   }
 }

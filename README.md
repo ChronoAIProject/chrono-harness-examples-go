@@ -10,10 +10,10 @@
 
 ```sh
 python3 .chrono-harness/bootstrap.py . --profile rates
-.chrono-harness/bin/chrono-harness check --config .chrono-harness/ci/check.json --base <完整基线SHA> --candidate <完整候选SHA> --unit rates
+.chrono-harness/bin/chrono-harness check --unit rates
 ```
 
-候选必须是当前干净提交。首个无父提交使用 `--initial --candidate <SHA>`，代替 `--base`。单元报告由工具写入 `.chrono-harness/state/units/<单元ID>/check.json`。CI 的检测步骤使用完全相同的 harness argv；平台和 SDK 读数由 bootstrap-result.json 记录，指令相同不宣称环境完全等价。
+候选必须是当前干净提交。上述短命令属于待安装兼容公开版本的配置候选；当前 beta.20 锁不兼容。输入生产者从登记的工作流目标解析本地固定端点，CI 从完整事件端点解析；不手写 shell 准备或日常 SHA 参数。报告仍由工具维护，同命令不宣称环境完全等价。
 
 每个 profile 明确选择 Git 版本探测。`bootstrap-result.json` 的 `tools` 记录所选
 probe 的实际调用路径、解析目标、执行物前后摘要，以及原始输出、摘要和退出码；
@@ -21,25 +21,33 @@ probe 的实际调用路径、解析目标、执行物前后摘要，以及原�
 目标文件名。这里的 `passed` 只表示启动与所选探测成功，不是 harness 检查或完整
 输入闭包的判词。这些读数供 AI 显式更新工具登记，程序不自动更新预期版本、改写配置或赋予政策准入。
 
-## 独立 workflow 与汇总
+## 条件独立 job 与汇总候选
 
-每个登记单元各有独立 workflow、checkout、检查状态与重跑入口；全部工作流由同一配置生成。启动 SDK 由 `bootstrap.json` 的同名 profile 显式选择，不按语言或目录推断。上面的命令以一个单元为例，把 `--profile` 与 `--unit` 换成同一个登记 ID 即可。
+这是配置／投影准备，尚未接入兼容公开运行时。`.chrono-harness/distribution.json` 保留 beta.20 的真实版本与摘要；不要用该安装执行新的短命令或发布此 workflow。兼容公开版本安装、本地检查、原生事件与 PR 落地由后续接入完成；生成和静态 verify 不证明这些结果。
 
-| 单元 ID | 完整测试计划 | Workflow |
+`.chrono-harness/ci/units.json` 是宿主唯一 CI 源。一个父 workflow 保留 dev／integration push 和 dev PR：`detect` 读取完整 Git 树差异，条件 job 各自保留原 runner、bootstrap profile、timeout、checkout、上传和重跑；无关 job 在申请 runner 前跳过。汇总 `aggregate` 使用 `always()`，唯一必需状态仍为 **chrono / collection**。实际 dev ruleset 已要求该状态；E1 没有修改远端规则。
+
+| 单元 ID | 完整测试计划 | 父 workflow job |
 |---|---|---|
-| `rates` | `test:rates-tests` | `.github/workflows/chrono-ci-rates.yml` |
-| `harness` | `test:bootstrap-tests` | `.github/workflows/chrono-ci-harness.yml` |
+| `rates` | `test:rates-tests` | `unit_rates` |
+| `harness` | `test:bootstrap-tests` | `unit_harness` |
 
-`chrono / collection` 等待并下载同一候选、事件和基线的各单元原始结果，然后用与本地相同的命令判定完整性：
+安装兼容公开版本后，在宿主根使用同一个登记短入口：
 
 ```sh
-python3 .chrono-harness/bootstrap.py . --profile collection
-.chrono-harness/bin/chrono-harness check --config .chrono-harness/ci/check.json --base <完整基线SHA> --candidate <完整候选SHA> --collect .chrono-harness/state/collection/manifest.json
+python3 .chrono-harness/bootstrap.py . --profile all
+.chrono-harness/bin/chrono-harness check
+.chrono-harness/bin/chrono-harness check --unit rates
+.chrono-harness/bin/chrono-harness check --collect
 ```
 
-本地在独立 checkout 并发运行单元，复制原始报告并显式登记 manifest 的单元、路径、报告摘要与 runner/judge 摘要；完整格式见 [CI 单元合同](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/ci-units.md)。汇总不重跑业务测试；缺失、重复、陈旧或失败结果不能通过。 本仓显式设置 manifest 上限 1 MiB、单份报告上限 64 MiB；scoped v3 报告采用紧凑 JSON，保留原始过程输出。更改候选或配置后须生成对应报告，不能调大上限复用旧绑定。无 DELTA 的单元标明无需运行产品测试，不代表其它单元通过。
+选单元时 bootstrap 使用同名 profile；汇总与检测用既有 `collection` profile，均不安装业务 SDK。config schema4 登记 chrono-worktree 本地生产者与 chrono-ci 原生生产者，后者拥有检测、事件输入与报告获取；`--collect` 不接 manifest 参数，不执行缺失的业务操作。需要但跳过、失败、缺失、陈旧或错配的单元均拒绝；未选单元无需假报告。单元分别在独立 checkout 执行，当前工作目录并发没有锁保证。
 
-一个单元失败不取消其它 workflow。修复并重跑该单元后，再重跑 collection；其它单元保持原 run。自动收集限 push/PR，手动 dispatch 组合使用显式 manifest。各单元准备输入期间若 integration 基线移动导致不一致，汇总明确失败，不复用错配结果。
+PR 使用事件 base/head；dev push 使用完整 before/after（含多次提交），integration push 保留显式 `origin/dev` 基线规则，检测只观察一次并固定给后续 job。无 workflow paths 过滤、API 文件列表截断或 HEAD^ 兜底。文档 DELTA 可以无需业务操作，但仍走结构与汇总检查。
+
+上传根显式缩为每个单元的 `.chrono-harness/state/units/ID/` 和汇总的 `.chrono-harness/state/collection/`，包含隐藏原始证据；检测证据在 `.chrono-harness/state/detection/`。既有 context 和报告路径保留。旧的单元 workflow 地址保留在 provider 作为迁移身份，文件通过显式 previous／next migrate 退役并从 FILEMAP 与 required_inputs 移除。其它文件不退役。现有 1 MiB manifest、64 MiB 单元报告与业务操作时限保持，实际成本未知。
+
+宿主自定义入口保持显式：config.json 是平台映射，短入口、输入生产者、工具和环境由 git/macos.json 与 git/linux.json 的原生政策分别拥有；业务命令和独立测试配对仍由 projects.json 拥有，选测边与计划由 FILEMAP 拥有，SDK 由 bootstrap.json 拥有。两个平台的 Git 值取自现有 Go 声明；TS／mix 的真实平台执行验证待完成。更新时保留这些宿主值，通过 units.json 生成／verify；公开版本号和摘要只能在兼容资产实际发布后更新。
 
 ## 登记与验收
 
@@ -66,7 +74,8 @@ The pinned release also installs `chrono-worktree`. The host policy is
 `feature/`, `integration/`, file ownership and artifacts. Project and FILEMAP
 registrations have one owner; directory names and languages do not select work.
 
-The pinned beta.20 release supports the adopted v2 policy. Successful creation
+The host retains its v2 worktree policy. Its use with the staged schema4
+host declarations still needs compatible public binaries. Successful creation
 or reconstruction publishes the finalized original report and
 `.chrono-harness/state/origin.json` in the new destination. Both branch kinds use
 the `integration` check role; local context and collection manifest paths are
@@ -74,8 +83,7 @@ the `integration` check role; local context and collection manifest paths are
 `.chrono-harness/state/collection/manifest.json`. The source and fetched target
 `dev` must carry the same committed policy before starting a lane. Existing lanes
 without an origin receipt need reconstruction from an adopted source; no origin
-evidence is synthesized. Full short-command checks require separate full-host
-activation.
+evidence is synthesized. The staged scoped short entry does not activate full governance.
 
 ```sh
 .chrono-harness/bin/chrono-worktree start --host-root . --config .chrono-harness/worktree.json --kind feature --name change --path ../my-change
@@ -134,8 +142,9 @@ or certify full governance or deterministic parity.
 
 ## 显式 Git 配置
 
-检查配置的 `policy.facts_config` 和 CI provider v3 的 `facts_config` 都指向
-`.chrono-harness/git/platforms.json`。选择器明确列出 macOS arm64 与 Linux x86_64
+候选检查配置的 `policy.facts_config`、`registration_config` 和 CI provider v4 的
+`facts_config` 都指向 `.chrono-harness/config.json`。既有 git/platforms.json
+保留相同的显式映射；原生政策位于 git/macos.json 与 git/linux.json，均为 schema4。选择器明确列出 macOS arm64 与 Linux x86_64
 各自的执行物路径、SHA-256、版本、环境和文件输入；不探测后自动接受新工具。
 两个平台仍执行同一条 `chrono-harness check` 命令。
 

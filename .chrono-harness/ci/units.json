@@ -1,7 +1,7 @@
 {
   "schema": "chrono-github-units/v1",
   "collection": {
-    "schema": "chrono-github-ci/v3",
+    "schema": "chrono-github-ci/v4",
     "workflow_path": ".github/workflows/chrono-ci.yml",
     "name": "chrono / collection",
     "runs_on": "ubuntu-24.04",
@@ -27,14 +27,15 @@
     "generator": ".chrono-harness/bin/chrono-ci",
     "check_config": ".chrono-harness/ci/check.json",
     "context_path": ".chrono-harness/state/collection/context.json",
-    "artifact_directory": ".chrono-harness/state/",
+    "artifact_directory": ".chrono-harness/state/collection/",
     "push_baselines": [
       {
         "ref_prefix": "refs/heads/integration/",
         "base_ref": "refs/heads/dev"
       }
     ],
-    "facts_config": ".chrono-harness/git/platforms.json"
+    "facts_config": ".chrono-harness/config.json",
+    "include_hidden_files": true
   },
   "units": {
     "rates": {
@@ -50,7 +51,7 @@
         "rates"
       ],
       "context_path": ".chrono-harness/state/units/rates/context.json",
-      "artifact_directory": ".chrono-harness/state/"
+      "artifact_directory": ".chrono-harness/state/units/rates/"
     },
     "harness": {
       "workflow_path": ".github/workflows/chrono-ci-harness.yml",
@@ -65,7 +66,7 @@
         "harness"
       ],
       "context_path": ".chrono-harness/state/units/harness/context.json",
-      "artifact_directory": ".chrono-harness/state/"
+      "artifact_directory": ".chrono-harness/state/units/harness/"
     }
   },
   "gather": {
@@ -86,5 +87,25 @@
     "manifest_path": ".chrono-harness/state/collection/manifest.json",
     "download_directory": ".chrono-harness/state/collection/downloads/",
     "report_path": ".chrono-harness/state/collection/gather.json"
+  },
+  "job_gating": {
+    "schema": "chrono-job-gating/v1",
+    "detector": {
+      "runs_on": "ubuntu-24.04",
+      "timeout_minutes": 45,
+      "bootstrap": [
+        "python3",
+        ".chrono-harness/bootstrap.py",
+        ".",
+        "--profile",
+        "collection"
+      ],
+      "sparse_checkout": [
+        ".chrono-harness/",
+        ".github/workflows/chrono-ci.yml",
+        ".gitignore"
+      ],
+      "evidence_directory": ".chrono-harness/state/detection/"
+    }
   }
 }

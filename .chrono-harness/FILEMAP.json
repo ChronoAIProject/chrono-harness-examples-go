@@ -287,7 +287,16 @@
       "owner": "repository",
       "surface": "judge-policy",
       "cost": "unmeasured",
-      "edges": []
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:bootstrap-tests"
+        }
+      ]
     },
     {
       "path": ".chrono-harness/judges.json",
@@ -308,26 +317,11 @@
       "owner": "repository",
       "surface": "judge-policy",
       "cost": "unmeasured",
-      "edges": []
-    },
-    {
-      "path": ".github/workflows/chrono-ci-rates.yml",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
       "edges": [
         {
           "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
-    },
-    {
-      "path": ".github/workflows/chrono-ci-harness.yml",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
-      "edges": [
+          "to": "test:rates-tests"
+        },
         {
           "kind": "test-execution",
           "to": "test:bootstrap-tests"
