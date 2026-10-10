@@ -156,6 +156,10 @@
         {
           "kind": "test-execution",
           "to": "test:bootstrap-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
         }
       ]
     },
@@ -172,6 +176,10 @@
         {
           "kind": "test-execution",
           "to": "test:bootstrap-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
         }
       ]
     },
@@ -188,6 +196,10 @@
         {
           "kind": "test-execution",
           "to": "test:bootstrap-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
         }
       ]
     },
@@ -228,6 +240,10 @@
         {
           "kind": "test-execution",
           "to": "test:bootstrap-tests"
+        },
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
         }
       ]
     },
@@ -397,6 +413,90 @@
           "to": "test:bootstrap-tests"
         }
       ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/probe.py",
+      "owner": "native-lifecycle",
+      "surface": "judge-implementation",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/probe_test.py",
+      "owner": "native-lifecycle-tests",
+      "surface": "test",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/policy.json",
+      "owner": "native-lifecycle",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/control.json",
+      "owner": "native-lifecycle",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/workflow.json",
+      "owner": "native-lifecycle",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".chrono-harness/experiments/native-lifecycle/README.md",
+      "owner": "native-lifecycle",
+      "surface": "documentation",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/native-lifecycle.yml",
+      "owner": "native-lifecycle",
+      "surface": "judge-policy",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:native-lifecycle-tests"
+        }
+      ]
     }
   ],
   "project_edges": [
@@ -424,6 +524,16 @@
       "from": "script:bootstrap-tests",
       "kind": "test-execution",
       "to": "test:bootstrap-tests"
+    },
+    {
+      "from": "script:native-lifecycle",
+      "kind": "test-execution",
+      "to": "test:native-lifecycle-tests"
+    },
+    {
+      "from": "script:native-lifecycle-tests",
+      "kind": "test-execution",
+      "to": "test:native-lifecycle-tests"
     }
   ],
   "cost_models": {
@@ -443,6 +553,10 @@
     {
       "test": "bootstrap-tests",
       "cost": "unmeasured"
+    },
+    {
+      "test": "native-lifecycle-tests",
+      "cost": "unmeasured"
     }
   ],
   "execution_plans": {
@@ -460,6 +574,13 @@
         "test.bootstrap"
       ],
       "timeout_seconds": 60,
+      "output_limit_bytes": 1048576
+    },
+    "test:native-lifecycle-tests": {
+      "operations": [
+        "test.native-lifecycle"
+      ],
+      "timeout_seconds": 120,
       "output_limit_bytes": 1048576
     }
   }

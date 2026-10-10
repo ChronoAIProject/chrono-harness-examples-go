@@ -1,0 +1,8 @@
+{
+  "case": "baseline",
+  "outcomes": {
+    "pull_request": "pass",
+    "merge_group": "pass",
+    "workflow_dispatch": "pass"
+  }
+}
