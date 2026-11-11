@@ -7,9 +7,9 @@
 本仓的 scoped 检查与 CI 事件准备显式采用 `.chrono-harness/config.json`，分别登记 macOS arm64／Linux x86_64 的 Git 执行物、版本、环境和 global 配置输入；未知平台、版本／摘要漂移或已登记缺席的 include 出现均须失败。配置更改由 AI 根据 bootstrap 实测更新并验证；工具不改预期值。仓库本地 Git 配置、Apple Git 的委托工具、OS／网络及完整 SDK 输入闭包仍未认证，平台选择不证明跨平台同判。
 
 
-本轮采用固定正式版 v0.1.0，源码 e7d8e9fd3e0d3245663601710a8bcd7d2ee4ebf4。生成的 install.sh 仅安装显式所选工具，bootstrap.py 调用它后继续安装本仓登记 SDK。根 config.json schema4 选择本地或 CI 输入，普通检查只运行 `.chrono-harness/bin/chrono-harness check`；候选已提交且干净，单元／汇总分别追加 `--unit ID`／无值 `--collect`。
+本轮采用固定测试版 v0.1.1-dev.43081032713.1.g4ac3661ab3a17a5822360e0860a04820e852999c，源码 4ac3661ab3a17a5822360e0860a04820e852999c。生成的 install.sh 仅安装显式所选工具，bootstrap.py 调用它后继续安装本仓登记 SDK。根 config.json schema4 选择本地或 CI 输入，普通检查只运行 `.chrono-harness/bin/chrono-harness check`；候选已提交且干净，单元／汇总分别追加 `--unit ID`／无值 `--collect`。
 
-CI 使用当前 provider v4 的同一父 workflow、DELTA detector 和独立条件 job；旧单元 workflow 已由当前父 workflow 覆盖并迁移。修改源后运行 `chrono-ci generate` 与 `verify`；指令源修改后运行 `chrono-instructions generate --host-root .`。不改变英语指南选择、业务测试、SDK profile 或显式 Git pin 的要求。
+CI 使用当前 provider v4 的同一父 workflow、DELTA detector 和独立条件 job；旧单元 workflow 已由当前父 workflow 覆盖并迁移。修改源后运行 `chrono-ci generate` 与 `verify`；指令源修改后运行 `chrono-instructions generate --host-root .`。指南按当前 manifest 的中文选择生成；业务测试、SDK profile 和显式 Git pin 继续由各自登记负责。
 
 本轮规则、CI 和安装链迁移先完成 feature → integration 的真实 PR 验收，再交付 integration → dev。GitHub 未开放自动合并，尝试使用现有权限启用返回 403；不申请额外权限。等待当前 head 的适用 CI 全部通过后，使用现有合并权限匹配当前 head 合并，不绕过现有保护，再核实际落地提交与 CI。
 
