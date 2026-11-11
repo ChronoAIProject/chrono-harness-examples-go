@@ -28,14 +28,11 @@
       ".chrono-harness/bootstrap.py",
       ".github/workflows/chrono-ci.yml",
       ".chrono-harness/distribution.json",
-      ".chrono-harness/install.py",
+      ".chrono-harness/install.sh",
       ".chrono-harness/config.json",
       ".chrono-harness/judges.json",
       ".chrono-harness/workflow.json",
       ".chrono-harness/worktree.json",
-      ".github/workflows/chrono-ci-rates.yml",
-      ".github/workflows/chrono-ci-harness.yml",
-      ".chrono-harness/git/platforms.json",
       ".chrono-harness/git/macos.json",
       ".chrono-harness/git/linux.json",
       ".chrono-harness/git/global.config"
@@ -64,10 +61,11 @@
       }
     },
     "shared_operations": {},
-    "facts_config": ".chrono-harness/git/platforms.json",
+    "facts_config": ".chrono-harness/config.json",
     "collection_limits": {
       "manifest_bytes": 1048576,
       "report_bytes": 67108864
-    }
+    },
+    "registration_config": ".chrono-harness/config.json"
   }
 }

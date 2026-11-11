@@ -55,24 +55,14 @@
       "owner": "repository",
       "surface": "instruction-policy",
       "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
+      "edges": []
     },
     {
       "path": "AGENTS.md",
       "owner": "repository",
       "surface": "instruction-policy",
       "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ],
+      "edges": [],
       "symlink": "CLAUDE.md"
     },
     {
@@ -80,36 +70,21 @@
       "owner": "repository",
       "surface": "instruction-policy",
       "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
+      "edges": []
     },
     {
       "path": ".chrono-harness/instructions/manifest.json",
       "owner": "repository",
       "surface": "instruction-policy",
       "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
+      "edges": []
     },
     {
       "path": ".chrono-harness/instructions/host-context.md",
       "owner": "repository",
       "surface": "instruction-policy",
       "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
+      "edges": []
     },
     {
       "path": ".gitignore",
@@ -267,7 +242,7 @@
       ]
     },
     {
-      "path": ".chrono-harness/install.py",
+      "path": ".chrono-harness/install.sh",
       "owner": "repository",
       "surface": "judge-implementation",
       "cost": "unmeasured",
@@ -309,46 +284,6 @@
       "surface": "judge-policy",
       "cost": "unmeasured",
       "edges": []
-    },
-    {
-      "path": ".github/workflows/chrono-ci-rates.yml",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
-    },
-    {
-      "path": ".github/workflows/chrono-ci-harness.yml",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
-    },
-    {
-      "path": ".chrono-harness/git/platforms.json",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:rates-tests"
-        },
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
     },
     {
       "path": ".chrono-harness/git/macos.json",
