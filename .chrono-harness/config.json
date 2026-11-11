@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 4,
   "status": "proposed",
   "enforcement": "not-implemented",
   "runner": {
@@ -17,14 +17,37 @@
     "operation": "validate.delta",
     "argv": [
       ".chrono-harness/bin/chrono-harness",
-      "check",
-      "--config",
-      ".chrono-harness/ci/check.json",
-      "--base",
-      "{base}",
-      "--candidate",
-      "{candidate}"
-    ]
+      "check"
+    ],
+    "profile": ".chrono-harness/ci/check.json",
+    "inputs": {
+      "local": {
+        "operation": "prepare.check.local",
+        "tool": "chrono-worktree",
+        "argv": [
+          "check-inputs",
+          "--config",
+          ".chrono-harness/worktree.json"
+        ]
+      },
+      "ci": {
+        "operation": "prepare.check.ci",
+        "tool": "chrono-ci",
+        "argv": [
+          "check-inputs",
+          "--config",
+          ".chrono-harness/ci/units.json",
+          "--event-env",
+          "GITHUB_EVENT_NAME",
+          "--payload-env",
+          "GITHUB_EVENT_PATH",
+          "--revision-env",
+          "CHRONO_WORKFLOW_REVISION",
+          "--repository-env",
+          "GITHUB_REPOSITORY"
+        ]
+      }
+    }
   },
   "tools": [
     {
@@ -62,6 +85,24 @@
         "version"
       ],
       "expected_version": null
+    },
+    {
+      "id": "git",
+      "program": "/usr/bin/git",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
+    },
+    {
+      "id": "chrono-worktree",
+      "program": ".chrono-harness/bin/chrono-worktree",
+      "resolution": "PATH-once",
+      "version_argv": [
+        "--version"
+      ],
+      "expected_version": null
     }
   ],
   "protocol": {
@@ -94,7 +135,20 @@
   "environment": {
     "inherit": [
       "PATH",
-      "HOME"
+      "HOME",
+      "TMPDIR",
+      "CHRONO_CHECK_SOURCE",
+      "GITHUB_EVENT_NAME",
+      "GITHUB_EVENT_PATH",
+      "CHRONO_WORKFLOW_REVISION",
+      "GITHUB_REPOSITORY",
+      "GITHUB_RUN_ID",
+      "GITHUB_RUN_ATTEMPT",
+      "GITHUB_JOB",
+      "CHRONO_CI_DETECTION",
+      "CHRONO_CI_NEEDS",
+      "GH_TOKEN",
+      "SSH_AUTH_SOCK"
     ],
     "values": {
       "GOTOOLCHAIN": "local",
@@ -102,12 +156,18 @@
       "GOPROXY": "off",
       "PYTHONDONTWRITEBYTECODE": "1"
     },
-    "inputs": []
+    "inputs": [],
+    "credential_environment": [
+      "GH_TOKEN"
+    ]
   },
   "input_closure": {
     "status": "incomplete",
     "unresolved": [
       "Bootstrap provenance, complete effective inputs and governance activation are not certified."
     ]
+  },
+  "facts_git": {
+    "tool": "git"
   }
 }

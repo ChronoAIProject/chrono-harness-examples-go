@@ -99,7 +99,7 @@ def main():
     root = args.host.resolve()
     cfg = json.loads((root / '.chrono-harness/bootstrap.json').read_text())
     profile, downloads, probes = selection(cfg, args.profile)
-    subprocess.run([sys.executable, str(root / '.chrono-harness/install.py'), str(root)], check=True)
+    subprocess.run(['/bin/sh', str(root / '.chrono-harness/install.sh'), '--host-root', str(root)], check=True)
     distribution = json.loads((root / '.chrono-harness/state/distribution.json').read_text())
     state = root / '.chrono-harness/state'
     cache_root = root / '.chrono-harness/cache'
