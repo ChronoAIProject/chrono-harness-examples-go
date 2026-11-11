@@ -6,14 +6,14 @@
 
 ## 运行
 
-需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-beta.20](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-beta.20) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.py` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
+需要 Git、Python ≥3.9、curl 和可下载固定发布/SDK 的网络。harness 使用 [chrono-harness v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7](https://github.com/ChronoAIProject/chrono-harness/releases/tag/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7) 的预构建二进制；`.chrono-harness/distribution.json` 锁定发布清单、平台与摘要，生成的 `install.sh` 执行统一安装。宿主不保留 harness 源码包，不需要 Rust。宿主 Go/Node/TypeScript SDK 独立登记在 bootstrap.json，支持 macOS arm64、Linux x86_64。
 
 ```sh
 python3 .chrono-harness/bootstrap.py . --profile rates
-.chrono-harness/bin/chrono-harness check --config .chrono-harness/ci/check.json --base <完整基线SHA> --candidate <完整候选SHA> --unit rates
+.chrono-harness/bin/chrono-harness check --unit rates
 ```
 
-候选必须是当前干净提交。首个无父提交使用 `--initial --candidate <SHA>`，代替 `--base`。单元报告由工具写入 `.chrono-harness/state/units/<单元ID>/check.json`。CI 的检测步骤使用完全相同的 harness argv；平台和 SDK 读数由 bootstrap-result.json 记录，指令相同不宣称环境完全等价。
+候选必须是当前干净提交。schema4 的 `canonical_check` 负责选择 profile 与本地／CI 输入，不手传基线、候选或配置。普通完整检查为 `.chrono-harness/bin/chrono-harness check`；显式单元使用 `--unit ID`，汇总为无值 `--collect`。CI 在相同入口设置 `CHRONO_CHECK_SOURCE=ci`。单元报告由工具写入 `.chrono-harness/state/units/<单元ID>/check.json`，SDK 观察见 bootstrap-result.json；相同命令不证明完整环境相同。
 
 每个 profile 明确选择 Git 版本探测。`bootstrap-result.json` 的 `tools` 记录所选
 probe 的实际调用路径、解析目标、执行物前后摘要，以及原始输出、摘要和退出码；
@@ -21,25 +21,23 @@ probe 的实际调用路径、解析目标、执行物前后摘要，以及原�
 目标文件名。这里的 `passed` 只表示启动与所选探测成功，不是 harness 检查或完整
 输入闭包的判词。这些读数供 AI 显式更新工具登记，程序不自动更新预期版本、改写配置或赋予政策准入。
 
-## 独立 workflow 与汇总
+## 独立单元与汇总
 
-每个登记单元各有独立 workflow、checkout、检查状态与重跑入口；全部工作流由同一配置生成。启动 SDK 由 `bootstrap.json` 的同名 profile 显式选择，不按语言或目录推断。上面的命令以一个单元为例，把 `--profile` 与 `--unit` 换成同一个登记 ID 即可。
+`.chrono-harness/ci/units.json` 是 CI 的唯一生成源。一个父 workflow 先按显式 DELTA 登记检测影响，再运行选中的独立 job；SDK profile、checkout、报告与重跑边界分别登记，不按语言或目录猜测。
 
-| 单元 ID | 完整测试计划 | Workflow |
+| 单元 ID | 完整测试计划 | 当前 workflow |
 |---|---|---|
-| `rates` | `test:rates-tests` | `.github/workflows/chrono-ci-rates.yml` |
-| `harness` | `test:bootstrap-tests` | `.github/workflows/chrono-ci-harness.yml` |
+| `rates` | `test:rates-tests` | `.github/workflows/chrono-ci.yml` |
+| `harness` | `test:bootstrap-tests` | `.github/workflows/chrono-ci.yml` |
 
-`chrono / collection` 等待并下载同一候选、事件和基线的各单元原始结果，然后用与本地相同的命令判定完整性：
+`chrono / collection` 下载同一候选、事件和基线的原始结果，然后调用相同入口汇总：
 
 ```sh
 python3 .chrono-harness/bootstrap.py . --profile collection
-.chrono-harness/bin/chrono-harness check --config .chrono-harness/ci/check.json --base <完整基线SHA> --candidate <完整候选SHA> --collect .chrono-harness/state/collection/manifest.json
+.chrono-harness/bin/chrono-harness check --collect
 ```
 
-本地在独立 checkout 并发运行单元，复制原始报告并显式登记 manifest 的单元、路径、报告摘要与 runner/judge 摘要；完整格式见 [CI 单元合同](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/ci-units.md)。汇总不重跑业务测试；缺失、重复、陈旧或失败结果不能通过。 本仓显式设置 manifest 上限 1 MiB、单份报告上限 64 MiB；scoped v3 报告采用紧凑 JSON，保留原始过程输出。更改候选或配置后须生成对应报告，不能调大上限复用旧绑定。无 DELTA 的单元标明无需运行产品测试，不代表其它单元通过。
-
-一个单元失败不取消其它 workflow。修复并重跑该单元后，再重跑 collection；其它单元保持原 run。自动收集限 push/PR，手动 dispatch 组合使用显式 manifest。各单元准备输入期间若 integration 基线移动导致不一致，汇总明确失败，不复用错配结果。
+汇总不重跑业务测试。缺失、重复、陈旧、失败或绑定不一致的结果须失败。单元未选中只表示本次 DELTA 无需运行其测试，不代表其他单元通过。原件显式包括隐藏的 `.chrono-harness/state/`，报告上限保持 manifest 1 MiB、单报告 64 MiB。独立 job 互不取消；通过原 workflow 的失败作业重跑恢复，不另造轮询器。
 
 ## 登记与验收
 
@@ -47,7 +45,7 @@ python3 .chrono-harness/bootstrap.py . --profile collection
 - README.md 修改 → 不运行产品测试；未登记文件 → 失败；实际测试非零 → harness 非零。
 - 项目配对、命令参数和依赖均在 `.chrono-harness/` 登记；不从扩展名、import、module 或目录推断选测。
 - `CLAUDE.md` 由原子规则生成；`AGENTS.md` 是其相对符号链接。修改指令源后运行 `.chrono-harness/bin/chrono-instructions generate --host-root .`。
-- CI 修改入口是 `.chrono-harness/ci/units.json`；运行 `.chrono-harness/bin/chrono-ci generate --host-root . --config .chrono-harness/ci/units.json`。受管工作流由 `chrono-ci verify` 检查。`push_baselines` 显式登记 integration 分支的所有 push 以 origin/dev 为基线，后续修复推送仍覆盖整个分支差异；dev 保持事件的 before/after。
+- CI 修改入口是 `.chrono-harness/ci/units.json`；运行 `.chrono-harness/bin/chrono-ci generate --host-root . --config .chrono-harness/ci/units.json`。受管工作流由 `chrono-ci verify` 检查。PR 覆盖 dev 和 integration/**，检查固定合并候选；dev push 按事件 before/after 检查真实落地变化。
 
 Git 未跟踪清单排除显式登记生成目录的内容，避免 SDK 与状态产物耗尽清单输出上限。未登记的忽略文件、相邻路径、被跟踪修改，以及替代目录的文件／符号链接仍须检查；它不自动发现归属或依赖。
 
@@ -66,7 +64,7 @@ The pinned release also installs `chrono-worktree`. The host policy is
 `feature/`, `integration/`, file ownership and artifacts. Project and FILEMAP
 registrations have one owner; directory names and languages do not select work.
 
-The pinned beta.20 release supports the adopted v2 policy. Successful creation
+The pinned 本轮测试版 release supports the adopted v2 policy. Successful creation
 or reconstruction publishes the finalized original report and
 `.chrono-harness/state/origin.json` in the new destination. Both branch kinds use
 the `integration` check role; local context and collection manifest paths are
@@ -74,8 +72,7 @@ the `integration` check role; local context and collection manifest paths are
 `.chrono-harness/state/collection/manifest.json`. The source and fetched target
 `dev` must carry the same committed policy before starting a lane. Existing lanes
 without an origin receipt need reconstruction from an adopted source; no origin
-evidence is synthesized. Full short-command checks require separate full-host
-activation.
+evidence is synthesized. Full governance requires separate full-host activation; schema4 short commands select this host’s scoped profile.
 
 ```sh
 .chrono-harness/bin/chrono-worktree start --host-root . --config .chrono-harness/worktree.json --kind feature --name change --path ../my-change
@@ -84,7 +81,7 @@ activation.
 The destination must not exist. `reconstruct` uses the same arguments plus
 `--plan .chrono-harness/state/reconstruction.json`, with explicit fixed base and
 candidate OIDs and a complete carry/retire path list. See the
-[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/worktree.md).
+[worktree contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md).
 Creation/reconstruction records actual Git results and preserves old work;
 reconstruction stages changes and requires a new commit and the canonical check.
 PR creation and merge remain caller-owned. Shared full-governance
@@ -108,7 +105,7 @@ requires an explicit retained branch/commit and selected disposable artifacts.
 Fetch-ref cleanup requires its original failed receipt and a fixed local branch
 preserving the expected commit. Reports retain failures and distinguish verified
 removal from unverified partial effects. See the pinned
-[maintenance contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/worktree.md#registered-recovery-and-cleanup)
+[maintenance contract](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md#registered-recovery-and-cleanup)
 for complete plan formats. Lost recovery identity, damaged Git metadata and
 PR/merge orchestration remain separate obligations.
 
@@ -128,14 +125,14 @@ Checkout recovery also requires the reconciled HEAD/index tree. Fetch cleanup
 requires the expected current OID and a local branch retaining it; an already
 absent ref needs an explicit retry plan. Both preserve the original bytes and
 keep the original outcome unknown; terminal reports use ordinary maintenance.
-See the pinned [interruption contracts](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/worktree.md#interrupted-checkout-recovery).
+See the pinned [interruption contracts](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md#interrupted-checkout-recovery).
 These commands do not reconstruct a lost index, make concurrent writers atomic,
 or certify full governance or deterministic parity.
 
 ## 显式 Git 配置
 
-检查配置的 `policy.facts_config` 和 CI provider v3 的 `facts_config` 都指向
-`.chrono-harness/git/platforms.json`。选择器明确列出 macOS arm64 与 Linux x86_64
+检查配置的 `policy.facts_config` 和 CI provider v4 的 `facts_config` 都指向
+`.chrono-harness/config.json`。选择器明确列出 macOS arm64 与 Linux x86_64
 各自的执行物路径、SHA-256、版本、环境和文件输入；不探测后自动接受新工具。
 两个平台仍执行同一条 `chrono-harness check` 命令。
 
@@ -149,18 +146,20 @@ Git 子进程只使用登记环境，禁用系统全局配置，选择宿主登�
 库、OS 和网络输入还没有完整登记。本节只声明已绑定的执行物、环境和文件，不认证
 完整闭包或跨平台同判。报告包含 Git 过程原始输出，宿主将判官报告上限显式设为
 16 MiB；这不是所有宿主适用的容量值。合同见固定版本的
-[Git facts](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/git-facts.md)。
+[Git facts](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/git-facts.md)。
 
 ## CI projections and remote retirement
 
-The pinned binaries also provide explicit release-workflow generation and full-context CI transport. This host retains its registered scoped profile; installing binaries does not activate full governance. See the pinned [release CI](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/release-ci.md) and [full context CI](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/full-ci.md) contracts.
+The pinned binaries also provide explicit release-workflow generation and full-context CI transport. This host retains its registered scoped profile; installing binaries does not activate full governance. See the pinned [release CI](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/release-ci.md) and [full context CI](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/full-ci.md) contracts.
 
-`chrono-worktree cleanup-remote` consumes an explicit state plan with the expected remote URL, work-branch OID and retained target commit. It performs exact leased deletion, verifies absence and preserves original failures; this is not an atomic remote transaction or a PR/merge verdict. See [remote retirement](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/worktree.md#remote-branch-retirement).
+`chrono-worktree cleanup-remote` consumes an explicit state plan with the expected remote URL, work-branch OID and retained target commit. It performs exact leased deletion, verifies absence and preserves original failures; this is not an atomic remote transaction or a PR/merge verdict. See [remote retirement](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md#remote-branch-retirement).
 
 ## Literal checkout and metadata recovery
 
 The pinned binaries compare registered Git-tree/index identities with physical bytes, file types and owner executable bits. Git configuration cannot silently normalize changed inputs for this comparison; checkouts must materialize the registered exact bytes.
 
-`chrono-worktree inspect-rebind` and `rebind` use an explicit branch, HEAD, chosen index tree, backup and donor to repair missing or damaged linked-checkout metadata while preserving observed work. They do not infer the lost historical index or original outcome. The pinned `resume-rebind` entry can continue from an original intent and explicit partial-result observations; conflicting state still requires AI reconciliation. See [metadata rebind](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/worktree.md#explicit-metadata-rebind) and [literal identity](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/git-facts.md#literal-checkout-identity).
+`chrono-worktree inspect-rebind` and `rebind` use an explicit branch, HEAD, chosen index tree, backup and donor to repair missing or damaged linked-checkout metadata while preserving observed work. They do not infer the lost historical index or original outcome. The pinned `resume-rebind` entry can continue from an original intent and explicit partial-result observations; conflicting state still requires AI reconciliation. See [metadata rebind](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md#explicit-metadata-rebind) and [literal identity](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/git-facts.md#literal-checkout-identity).
 
-The pinned `chrono-ci migrate` command supports explicit owned workflow transitions and preserves host configuration. For ordinary binary upgrades the existing provider, SDK profiles and generated workflows stay unchanged; use `verify` and the same unit checks. See [host customization and updates](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-beta.20/docs/ci-units.md#host-customization-and-updates).
+The pinned `chrono-ci migrate` command supports explicit owned workflow transitions and preserves host configuration. For ordinary binary upgrades the existing provider, SDK profiles and generated workflows stay unchanged; use `verify` and the same unit checks. See [host customization and updates](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/ci-units.md#host-customization-and-updates).
+
+根 config.json 是已登记的 OS／架构选择器，分别读取 git/macos.json 与 git/linux.json 中的完整 schema4 政策；检查 profile 的 registration_config 与 facts_config 都绑定根入口。两份政策保留原 Git 执行物 pin、global 配置及缺席 include，短命令、CI 与业务 action 同时由所选政策提供。
