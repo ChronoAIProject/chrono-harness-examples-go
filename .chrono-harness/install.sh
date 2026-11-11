@@ -10,15 +10,15 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.0-dev.43014938582.1.ge7d8e9fd3e0d3245663601710a8bcd7d2ee4ebf4'
+    version='v0.1.0'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.0-dev.43014938582.1.ge7d8e9fd3e0d3245663601710a8bcd7d2ee4ebf4'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.0'
     curl='/usr/bin/curl'
     default_tools='chrono-ci chrono-harness chrono-instructions chrono-judge-ci chrono-judge-registration chrono-worktree'
-    manifest_sha256='7052c443407f152a86d080f732625504717f1abcaff00653dbf8ce02613cec77'
-    manifest_size='6284'
-    lock_sha256='6be0af0568bb2b84e3d9858fc198352dc84880ed20c2a4e64585a5cd2bba1314'
-    lock_size=1288
+    manifest_sha256='75f5cad2c7870038c49a3f7c99f625b8e38ae072be7e659d26557b2d39f3819f'
+    manifest_size='6224'
+    lock_sha256='f448bc38abd8b1d900395fd6f46eef10858d1711fe0c4d259d6c0fd5b5accfbd'
+    lock_size=1168
 
     host_root=.
     tools=
