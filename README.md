@@ -72,8 +72,7 @@ the `integration` check role; local context and collection manifest paths are
 `.chrono-harness/state/collection/manifest.json`. The source and fetched target
 `dev` must carry the same committed policy before starting a lane. Existing lanes
 without an origin receipt need reconstruction from an adopted source; no origin
-evidence is synthesized. Full short-command checks require separate full-host
-activation.
+evidence is synthesized. Full governance requires separate full-host activation; schema4 short commands select this host’s scoped profile.
 
 ```sh
 .chrono-harness/bin/chrono-worktree start --host-root . --config .chrono-harness/worktree.json --kind feature --name change --path ../my-change
@@ -133,7 +132,7 @@ or certify full governance or deterministic parity.
 ## 显式 Git 配置
 
 检查配置的 `policy.facts_config` 和 CI provider v4 的 `facts_config` 都指向
-`.chrono-harness/git/platforms.json`。选择器明确列出 macOS arm64 与 Linux x86_64
+`.chrono-harness/config.json`。选择器明确列出 macOS arm64 与 Linux x86_64
 各自的执行物路径、SHA-256、版本、环境和文件输入；不探测后自动接受新工具。
 两个平台仍执行同一条 `chrono-harness check` 命令。
 
@@ -162,3 +161,5 @@ The pinned binaries compare registered Git-tree/index identities with physical b
 `chrono-worktree inspect-rebind` and `rebind` use an explicit branch, HEAD, chosen index tree, backup and donor to repair missing or damaged linked-checkout metadata while preserving observed work. They do not infer the lost historical index or original outcome. The pinned `resume-rebind` entry can continue from an original intent and explicit partial-result observations; conflicting state still requires AI reconciliation. See [metadata rebind](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/worktree.md#explicit-metadata-rebind) and [literal identity](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/git-facts.md#literal-checkout-identity).
 
 The pinned `chrono-ci migrate` command supports explicit owned workflow transitions and preserves host configuration. For ordinary binary upgrades the existing provider, SDK profiles and generated workflows stay unchanged; use `verify` and the same unit checks. See [host customization and updates](https://github.com/ChronoAIProject/chrono-harness/blob/v0.1.0-dev.42997777130.1.g0f081567fe9ce64c439b2c7a8e893ca403d5eec7/docs/ci-units.md#host-customization-and-updates).
+
+根 config.json 是已登记的 OS／架构选择器，分别读取 git/macos.json 与 git/linux.json 中的完整 schema4 政策；检查 profile 的 registration_config 与 facts_config 都绑定根入口。两份政策保留原 Git 执行物 pin、global 配置及缺席 include，短命令、CI 与业务 action 同时由所选政策提供。

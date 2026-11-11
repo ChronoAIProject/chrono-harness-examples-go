@@ -286,22 +286,6 @@
       "edges": []
     },
     {
-      "path": ".chrono-harness/git/platforms.json",
-      "owner": "repository",
-      "surface": "judge-policy",
-      "cost": "unmeasured",
-      "edges": [
-        {
-          "kind": "test-execution",
-          "to": "test:rates-tests"
-        },
-        {
-          "kind": "test-execution",
-          "to": "test:bootstrap-tests"
-        }
-      ]
-    },
-    {
       "path": ".chrono-harness/git/macos.json",
       "owner": "repository",
       "surface": "judge-policy",
