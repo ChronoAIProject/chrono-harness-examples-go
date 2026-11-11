@@ -136,7 +136,7 @@ def main():
         report['status']='passed'
     finally:
         (state / 'bootstrap-result.json').write_text(json.dumps(report,indent=2)+'\n')
-    print(json.dumps(report['versions']))
+    print(json.dumps(report))
 
 if __name__ == '__main__':
     main()

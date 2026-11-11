@@ -14,3 +14,5 @@ CI 使用当前 provider v4 的同一父 workflow、DELTA detector 和独立条�
 本轮规则、CI 和安装链迁移先完成 feature → integration 的真实 PR 验收，再交付 integration → dev。GitHub 未开放自动合并，尝试使用现有权限启用返回 403；不申请额外权限。等待当前 head 的适用 CI 全部通过后，使用现有合并权限匹配当前 head 合并，不绕过现有保护，再核实际落地提交与 CI。
 
 根 config.json 是已登记的 OS／架构选择器，分别读取 git/macos.json 与 git/linux.json 中的完整 schema4 政策；检查 profile 的 registration_config 与 facts_config 都绑定根入口。两份政策保留原 Git 执行物 pin、global 配置及缺席 include，短命令、CI 与业务 action 同时由所选政策提供。
+
+bootstrap 将自己的完整观察回执同时写入 bootstrap-result.json 和 stdout，供原生 CI 日志保留本轮精确 Git 版本、路径和摘要。AI 从该候选实际回执显式更新漂移的 pin，不使用其他仓库的观察或把预期置空。
