@@ -192,6 +192,7 @@
   },
   "facts_git": {
     "tool": "facts-git",
+    "input": "facts-git-executable",
     "guard": {
       "schema": "chrono-git-inputs/v1",
       "inputs": [
