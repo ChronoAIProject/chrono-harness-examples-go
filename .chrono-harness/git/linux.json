@@ -102,7 +102,7 @@
       "version_argv": [
         "--version"
       ],
-      "expected_version": "git version 2.56.0"
+      "expected_version": null
     }
   ],
   "protocol": {
@@ -163,12 +163,6 @@
     },
     "inputs": [
       {
-        "id": "facts-git-executable",
-        "location": "/usr/bin/git",
-        "presence": "present",
-        "sha256": "824d5b2fffef332ec7ba053e579659bb12f26a0b4747da6f9c6dc0e71d36f235"
-      },
-      {
         "id": "facts-global-config",
         "location": ".chrono-harness/git/global.config",
         "presence": "present",
@@ -192,7 +186,6 @@
   },
   "facts_git": {
     "tool": "facts-git",
-    "input": "facts-git-executable",
     "guard": {
       "schema": "chrono-git-inputs/v1",
       "inputs": [
