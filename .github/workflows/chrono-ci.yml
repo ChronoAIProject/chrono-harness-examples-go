@@ -42,6 +42,7 @@ jobs:
         env:
           CHRONO_WORKFLOW_REVISION: ${{ github.workflow_sha }}
         run: |
+          sha256sum /usr/bin/git
           '.chrono-harness/bin/chrono-ci' detect --host-root . --config '.chrono-harness/ci/units.json' --github-output "$GITHUB_OUTPUT"
   unit_harness:
     outputs:
