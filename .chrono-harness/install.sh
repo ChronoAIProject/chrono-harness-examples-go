@@ -10,14 +10,14 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.5-dev.43505956443.1.gca923e075fcadab90336d70ab8dd64019fe098af'
+    version='v0.1.5-dev.43513126210.1.g25c3d192687b1d416ab9fc7efc574c81311aac59'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43505956443.1.gca923e075fcadab90336d70ab8dd64019fe098af'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43513126210.1.g25c3d192687b1d416ab9fc7efc574c81311aac59'
     curl='/usr/bin/curl'
     default_tools='chrono-cache chrono-ci chrono-distribution chrono-harness chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-worktree'
-    manifest_sha256='aeb51e70836edb0e4e3162eeb4b388ddfdb5355c19bfdd7c9c624e64c72f4cda'
+    manifest_sha256='df99aa7bb88711f6422bec883b542ca6d547529fa9b052c257804eb6d645185f'
     manifest_size='6649'
-    lock_sha256='5504e54b00878b0c8f44c15decb0949e61293470cd0ad0cae789bff70ade3c34'
+    lock_sha256='987644920e16a4be2a1006d8aaf2f22646c205fae4052132ffe31a5f0a18bc69'
     lock_size=1946
 
     host_root=.
