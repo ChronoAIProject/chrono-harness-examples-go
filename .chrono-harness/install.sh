@@ -9,16 +9,14 @@ fail() {
 
 main() {
     # All declarations below are shell-quoted by the Rust producer.
-    mode='install'
-    version='v0.1.5-dev.43489853160.1.g846af39b2372f607dfdd496bc26b41311c497348'
+    mode='adopt'
+    version='v0.1.5-dev.43490624514.1.g00abeb0c559268f8ac762341fbcc00a0c1648071'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43489853160.1.g846af39b2372f607dfdd496bc26b41311c497348'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43490624514.1.g00abeb0c559268f8ac762341fbcc00a0c1648071'
     curl='/usr/bin/curl'
     default_tools='chrono-cache chrono-ci chrono-distribution chrono-harness chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-worktree'
-    manifest_sha256='78a6a8578c2f02a2f4410d28a0800a9b8c75fae7f1c9a56acbd43ea733d53245'
+    manifest_sha256='2c07aea6fc10e911eca01d71d227de131d0efaf44a4365cbf437e189d2db590c'
     manifest_size='6649'
-    lock_sha256='48eab8b6e4b2ac923d1610d840a60d617d15979615cd675d2ac055fd106107b2'
-    lock_size=1946
 
     host_root=.
     tools=
@@ -59,8 +57,8 @@ main() {
         *) fail 'unsupported operating system or architecture' ;;
     esac
     case "$platform" in
-        'linux-x86_64') installer_sha256='9091d00b8beb1546781c1031662fc171a14aa264ea24ff1e84c0996a045403c3'; installer_size=1657696 ;;
-        'macos-aarch64') installer_sha256='b3a21d966d19bf360daecaea1bdb1722b08e394a81c95648c337068ba7034837'; installer_size=1329600 ;;
+        'linux-x86_64') installer_sha256='006651f2331bae218bd00b47f2409a1759ca14034e318b75fc6ccdf702cfbd7d'; installer_size=1660576 ;;
+        'macos-aarch64') installer_sha256='301a6d248c7a08d97bd6401c7a32dfa89f4f49548e04b18808a7d0630271b32a'; installer_size=1329600 ;;
 
         *) fail "release has no installer for $platform" ;;
     esac
