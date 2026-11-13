@@ -10,15 +10,15 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.4-dev.43348924098.1.g1ca9aa00be1147202d1cf3935ced4ba186eb3bba'
+    version='v0.1.4-dev.43364900625.1.g3e914ac44a191ca7f63456fb50cc251b6d230f9b'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.4-dev.43348924098.1.g1ca9aa00be1147202d1cf3935ced4ba186eb3bba'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.4-dev.43364900625.1.g3e914ac44a191ca7f63456fb50cc251b6d230f9b'
     curl='/usr/bin/curl'
-    default_tools='chrono-ci chrono-harness chrono-instructions chrono-judge-ci chrono-judge-registration chrono-worktree'
-    manifest_sha256='aba17a9b40bdb7bc3a939275e2f4fa2512829ae358d1ed3f93f1ed6244c99a0b'
+    default_tools='chrono-cache chrono-ci chrono-distribution chrono-harness chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-worktree'
+    manifest_sha256='131a3f46d1eaf7fdd0d44137e11a3f81006ad9838db052162cdfb516b0464876'
     manifest_size='6649'
-    lock_sha256='6185e883138939dbaaabf9017acbcd165c7faf92fb9e1c98afaea3d63fb3f088'
-    lock_size=1288
+    lock_sha256='565b6910c6704fa246e67ed0556716912eb632a4819df562f2177d504ae1fe91'
+    lock_size=1946
 
     host_root=.
     tools=
@@ -59,8 +59,8 @@ main() {
         *) fail 'unsupported operating system or architecture' ;;
     esac
     case "$platform" in
-        'linux-x86_64') installer_sha256='6c3002b7c6d24025a963353ae14f6f7656839a99d25abcfee4c87417da8b733a'; installer_size=1653840 ;;
-        'macos-aarch64') installer_sha256='a556921e2baf7f8dc26e47cfa3eebda631f064bbf3eaf371b849a5381acc94ba'; installer_size=1330032 ;;
+        'linux-x86_64') installer_sha256='a2e20b8e4eb823a9fa455b78f37f730962f5abb8cee3f8ea95e5a548841b15fd'; installer_size=1656256 ;;
+        'macos-aarch64') installer_sha256='95545bfad80f793a4e40e7527490ba98610a4a16111c952f816bd9829aca7047'; installer_size=1329600 ;;
 
         *) fail "release has no installer for $platform" ;;
     esac
