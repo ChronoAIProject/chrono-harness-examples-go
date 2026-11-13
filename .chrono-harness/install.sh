@@ -10,14 +10,14 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.4-dev.43403262640.1.gf14b11005a034283d15e144d950ea9524968c2d6'
+    version='v0.1.4-dev.43411762402.1.gf348ea7425b3430a0134fa346e8d97bc2d9f527a'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.4-dev.43403262640.1.gf14b11005a034283d15e144d950ea9524968c2d6'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.4-dev.43411762402.1.gf348ea7425b3430a0134fa346e8d97bc2d9f527a'
     curl='/usr/bin/curl'
     default_tools='chrono-cache chrono-ci chrono-distribution chrono-harness chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-worktree'
-    manifest_sha256='1b24d2ccbebd6fd04aaf5c490645f6689479fa999c332f25a76aac27b3d1c3d0'
+    manifest_sha256='fc9392c1af6a87bbe67d586f72db7de0656a9332514d93ac8de65c880930ba93'
     manifest_size='6649'
-    lock_sha256='cbb67c1ddf24a66b07cf062303ae6ca353e227081883501affae83f112cc5341'
+    lock_sha256='54ccb1255d070710f73acf686a88e595c5944e17a11235fbf3287b925daa0883'
     lock_size=1946
 
     host_root=.
@@ -60,7 +60,7 @@ main() {
     esac
     case "$platform" in
         'linux-x86_64') installer_sha256='e8df377c71fe77bcd9726f7ae2c96cb34ec484f0b9b4bce117553eb17a9313ee'; installer_size=1656256 ;;
-        'macos-aarch64') installer_sha256='95545bfad80f793a4e40e7527490ba98610a4a16111c952f816bd9829aca7047'; installer_size=1329600 ;;
+        'macos-aarch64') installer_sha256='6abc37db7bec4f1e1a3013b4ded5090b7078ba587d63f4b433e84f88d6434c29'; installer_size=1329600 ;;
 
         *) fail "release has no installer for $platform" ;;
     esac
