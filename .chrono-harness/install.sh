@@ -10,15 +10,15 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.3'
+    version='v0.1.3-dev.43330973476.1.g58dad6b55c552f2a58dbe8cbb9506bf46725a2fa'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.3'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.3-dev.43330973476.1.g58dad6b55c552f2a58dbe8cbb9506bf46725a2fa'
     curl='/usr/bin/curl'
     default_tools='chrono-ci chrono-harness chrono-instructions chrono-judge-ci chrono-judge-registration chrono-worktree'
-    manifest_sha256='83caaa4e79485e0ad2ad0f45d84701d53dd34e0fa3234ea0570c6ee2dbb3651d'
-    manifest_size='6589'
-    lock_sha256='dce96dcdc4b12e54c30b9209befff8ade9765557517bce2b9ee74433a3d0ba4d'
-    lock_size=1168
+    manifest_sha256='e89d8da55253a2b214e1fb30ee149f366bd40cd3177072afe9d2459aed2fe72b'
+    manifest_size='6649'
+    lock_sha256='6855ed95434e017fe30a498d697b0cb9ec8c4db1b03ba1aba23a91af83128db5'
+    lock_size=1288
 
     host_root=.
     tools=
@@ -59,7 +59,7 @@ main() {
         *) fail 'unsupported operating system or architecture' ;;
     esac
     case "$platform" in
-        'linux-x86_64') installer_sha256='9f0de771f2ec0c750fca39cdd9c8ed83bfb3a4d1822044150b9bca095070ef7c'; installer_size=1653776 ;;
+        'linux-x86_64') installer_sha256='86c1c2d76eb038b9d03591132325d1495dd546fa4af03b4862146369e33829a1'; installer_size=1653776 ;;
         'macos-aarch64') installer_sha256='a222d0a24439149e767aaf3c3d60ca661e27805e627e848533a93afcdf63e5e9'; installer_size=1330032 ;;
 
         *) fail "release has no installer for $platform" ;;
