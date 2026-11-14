@@ -1,25 +1,25 @@
 {
   "schema": "chrono-install/v1",
-  "version": "v0.1.5-dev.43554073663.1.g4c46388bcd5c6b9e24299bce462d68134d84f400",
+  "version": "v0.1.5-dev.43564024873.1.gffceb1e1dd81fbbc245afe239ed32c008b828e2d",
   "source": {
     "kind": "https",
-    "base_url": "https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43554073663.1.g4c46388bcd5c6b9e24299bce462d68134d84f400",
+    "base_url": "https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.43564024873.1.gffceb1e1dd81fbbc245afe239ed32c008b828e2d",
     "curl": "/usr/bin/curl"
   },
   "manifest": {
     "file": "release.json",
-    "sha256": "09c7f72ac38ffd3516452ace1716b8dd053f934fb6dbdf2aea1b63ab34b3f116",
+    "sha256": "476facc51c2c12f5f03f69cbcbc4649686e20d5bd9ad3a592e515059ed661f3c",
     "size": 6649
   },
   "installers": {
     "linux-x86_64": {
       "file": "chrono-distribution-linux-x86_64",
-      "sha256": "006651f2331bae218bd00b47f2409a1759ca14034e318b75fc6ccdf702cfbd7d",
-      "size": 1660576
+      "sha256": "54f37adb98b588289bc27a6830a29a2ab81ec0231ccd2f6828aeffe85795d6b1",
+      "size": 1656800
     },
     "macos-aarch64": {
       "file": "chrono-distribution-macos-aarch64",
-      "sha256": "301a6d248c7a08d97bd6401c7a32dfa89f4f49548e04b18808a7d0630271b32a",
+      "sha256": "306167fbd3abeec4edbd494b936823154b4882efe630e0c230999e371e5c8086",
       "size": 1329600
     }
   },
