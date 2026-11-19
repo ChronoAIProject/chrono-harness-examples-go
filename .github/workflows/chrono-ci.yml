@@ -32,16 +32,30 @@ jobs:
             .chrono-harness/
             .github/workflows/chrono-ci.yml
           persist-credentials: true
+      - name: Read release install layout tools
+        id: chrono_layout_0
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -eo pipefail
+          digest=$(jq -sceS '
+            select(length == 1) | .[0]
+            | select(.schema == "chrono-install/v1")
+            | select(.install | type == "object" and length > 0 and all(.[]; type == "string" and length > 0))
+            | [.schema, .install]
+          ' < '.chrono-harness/distribution.json' | shasum -a 256)
+          printf 'digest=%s\n' "${digest%% *}" >> "$GITHUB_OUTPUT"
       - name: Restore download cache tools
         id: chrono_download_0
+        if: ${{ steps.chrono_layout_0.outcome == 'success' }}
         continue-on-error: true
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
+          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
           path: |
             .chrono-harness/bin/
           restore-keys: |
-            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-
+            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-
           fail-on-cache-miss: false
       - name: Bootstrap registered detector tools
         shell: bash
@@ -55,11 +69,11 @@ jobs:
         run: |
           '.chrono-harness/bin/chrono-ci' detect --host-root . --config '.chrono-harness/ci/units.json' --github-output "$GITHUB_OUTPUT"
       - name: Save download cache tools
-        if: ${{ github.event_name == 'push' && always() && !cancelled() && steps.chrono_download_0.outcome == 'success' && steps.chrono_download_0.outputs.cache-hit != 'true' }}
+        if: ${{ github.event_name == 'push' && success() && !cancelled() && steps.chrono_download_0.outcome == 'success' && steps.chrono_download_0.outputs.cache-hit != 'true' }}
         continue-on-error: true
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
+          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
           path: |
             .chrono-harness/bin/
   unit_harness:
@@ -78,16 +92,30 @@ jobs:
           fetch-depth: 2
           filter: blob:none
           persist-credentials: true
+      - name: Read release install layout tools
+        id: chrono_layout_0
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -eo pipefail
+          digest=$(jq -sceS '
+            select(length == 1) | .[0]
+            | select(.schema == "chrono-install/v1")
+            | select(.install | type == "object" and length > 0 and all(.[]; type == "string" and length > 0))
+            | [.schema, .install]
+          ' < '.chrono-harness/distribution.json' | shasum -a 256)
+          printf 'digest=%s\n' "${digest%% *}" >> "$GITHUB_OUTPUT"
       - name: Restore download cache tools
         id: chrono_download_0
+        if: ${{ steps.chrono_layout_0.outcome == 'success' }}
         continue-on-error: true
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
+          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
           path: |
             .chrono-harness/bin/
           restore-keys: |
-            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-
+            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-
           fail-on-cache-miss: false
       - name: Bootstrap registered tools
         shell: bash
@@ -141,16 +169,30 @@ jobs:
           restore-keys: |
             chrono-download-v1-release-tools-sdk.rates-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/sdk/go.json') }}-
           fail-on-cache-miss: false
+      - name: Read release install layout tools
+        id: chrono_layout_1
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -eo pipefail
+          digest=$(jq -sceS '
+            select(length == 1) | .[0]
+            | select(.schema == "chrono-install/v1")
+            | select(.install | type == "object" and length > 0 and all(.[]; type == "string" and length > 0))
+            | [.schema, .install]
+          ' < '.chrono-harness/distribution.json' | shasum -a 256)
+          printf 'digest=%s\n' "${digest%% *}" >> "$GITHUB_OUTPUT"
       - name: Restore download cache tools
         id: chrono_download_1
+        if: ${{ steps.chrono_layout_1.outcome == 'success' }}
         continue-on-error: true
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
+          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_1.outputs.digest }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
           path: |
             .chrono-harness/bin/
           restore-keys: |
-            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-
+            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_1.outputs.digest }}-
           fail-on-cache-miss: false
       - name: Bootstrap registered tools
         shell: bash
@@ -199,16 +241,30 @@ jobs:
           fetch-depth: 2
           filter: blob:none
           persist-credentials: true
+      - name: Read release install layout tools
+        id: chrono_layout_0
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -eo pipefail
+          digest=$(jq -sceS '
+            select(length == 1) | .[0]
+            | select(.schema == "chrono-install/v1")
+            | select(.install | type == "object" and length > 0 and all(.[]; type == "string" and length > 0))
+            | [.schema, .install]
+          ' < '.chrono-harness/distribution.json' | shasum -a 256)
+          printf 'digest=%s\n' "${digest%% *}" >> "$GITHUB_OUTPUT"
       - name: Restore download cache tools
         id: chrono_download_0
+        if: ${{ steps.chrono_layout_0.outcome == 'success' }}
         continue-on-error: true
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
+          key: "chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-${{ hashFiles('.chrono-harness/distribution.json') }}-${{ hashFiles('.chrono-harness/install.sh') }}"
           path: |
             .chrono-harness/bin/
           restore-keys: |
-            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.chrono-harness/distribution.json') }}-
+            chrono-download-v1-release-tools-tools-${{ runner.os }}-${{ runner.arch }}-layout-v1-${{ steps.chrono_layout_0.outputs.digest }}-
           fail-on-cache-miss: false
       - name: Bootstrap registered tools
         shell: bash
