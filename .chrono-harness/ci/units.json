@@ -95,5 +95,59 @@
         ".github/workflows/chrono-ci.yml"
       ]
     }
+  },
+  "persistent_cache": {
+    "schema": "chrono-github-cache/v1",
+    "restore_action": "actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830",
+    "save_action": "actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830",
+    "save_on_push_only": true,
+    "jobs": {},
+    "downloads": {
+      "schema": "chrono-github-downloads/v1",
+      "namespace": "release-tools",
+      "artifact_registry": ".chrono-harness/git/linux.json",
+      "environment": {},
+      "entries": {
+        "tools": {
+          "owner": "repository",
+          "need": "复用固定 Release 的工具。",
+          "output_use": "原安装器校验大小、摘要和可执行权限，从固定 Release 补齐工具。",
+          "paths": [
+            ".chrono-harness/bin/"
+          ],
+          "compatibility_files": [
+            ".chrono-harness/distribution.json"
+          ],
+          "source_files": [
+            ".chrono-harness/install.sh"
+          ],
+          "consumers": [
+            "detect",
+            "unit_rates",
+            "unit_harness",
+            "aggregate"
+          ],
+          "save_job": "detect"
+        },
+        "sdk.rates": {
+          "owner": "repository",
+          "need": "复用此业务单元使用的固定版本 SDK 压缩档。",
+          "output_use": "bootstrap 校验归档摘要，按登记的下载地址恢复缺失或损坏的归档。",
+          "paths": [
+            ".chrono-harness/cache/downloads/"
+          ],
+          "compatibility_files": [
+            ".chrono-harness/bootstrap.json"
+          ],
+          "source_files": [
+            ".chrono-harness/bootstrap.py"
+          ],
+          "consumers": [
+            "unit_rates"
+          ],
+          "save_job": "unit_rates"
+        }
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@
 """Install pinned harness tools and SDKs from the selected explicit host profile."""
 import argparse, base64, hashlib, io, json, os, platform, shutil, subprocess, sys, tarfile, urllib.request
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 def verified(data, integrity):
     algorithm, expected = integrity.split('-', 1)
@@ -12,6 +13,20 @@ def verified(data, integrity):
     if not matches:
         raise ValueError('distribution integrity mismatch')
     return data
+
+def sdk_archive(cache, variant):
+    try:
+        return verified(cache.read_bytes(), variant['integrity'])
+    except (FileNotFoundError, ValueError):
+        pass
+    with urllib.request.urlopen(variant['url'], timeout=120) as response:
+        data = verified(response.read(), variant['integrity'])
+    with TemporaryDirectory(dir=cache.parent) as directory:
+        archive = Path(directory) / 'archive'
+        archive.write_bytes(data)
+        archive.replace(cache)
+    return data
+
 
 def unpack(data, target):
     target.mkdir(parents=True, exist_ok=True)
@@ -112,10 +127,7 @@ def main():
             raise ValueError('undeclared tool platform: '+platform_id)
         cache = cache_root / 'downloads' / variant['integrity'].replace('/', '_').replace('+', '_')
         cache.parent.mkdir(parents=True,exist_ok=True)
-        data = cache.read_bytes() if cache.exists() else urllib.request.urlopen(variant['url'],timeout=120).read()
-        verified(data, variant['integrity'])
-        if not cache.exists():
-            cache.write_bytes(data)
+        data = sdk_archive(cache, variant)
         unpack(data, root / item['directory'])
         for source_path, destination in variant.get('install', []):
             installed.append((root / item['directory'] / source_path, root / destination))
