@@ -19,7 +19,8 @@
     "artifacts": [
       ".chrono-harness/bin/",
       ".chrono-harness/state/",
-      ".chrono-harness/cache/"
+      ".chrono-harness/cache/downloads/",
+      ".chrono-harness/cache/sdk/"
     ],
     "required_inputs": [
       ".chrono-harness/ci/check.json",
