@@ -126,7 +126,13 @@
       "tracked": false
     },
     {
-      "path": ".chrono-harness/cache/",
+      "path": ".chrono-harness/cache/downloads/",
+      "owner": "repository",
+      "kind": "download-cache",
+      "tracked": false
+    },
+    {
+      "path": ".chrono-harness/cache/sdk/",
       "owner": "repository",
       "kind": "download-cache",
       "tracked": false

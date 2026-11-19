@@ -196,6 +196,25 @@ class Distribution(unittest.TestCase):
                     self.run_profile(config, root)
                 self.assertFalse((root / '.chrono-harness/state/installer-ran').exists())
 
+    def test_sdk_archive_restores_and_reuses_verified_download(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory) / 'archive'
+            data = b'verified SDK'
+            variant = {'url': 'https://example.invalid/sdk', 'integrity': 'sha256-' + hashlib.sha256(data).hexdigest()}
+            with mock.patch.object(bootstrap.urllib.request, 'urlopen', side_effect=lambda *a, **kw: io.BytesIO(data)) as fetch:
+                self.assertEqual(bootstrap.sdk_archive(cache, variant), data)
+                self.assertEqual(bootstrap.sdk_archive(cache, variant), data)
+                fetch.assert_called_once_with(variant['url'], timeout=120)
+                cache.write_bytes(b'damaged')
+                self.assertEqual(bootstrap.sdk_archive(cache, variant), data)
+                self.assertEqual(cache.read_bytes(), data)
+                self.assertEqual(fetch.call_count, 2)
+            cache.write_bytes(b'prior')
+            with mock.patch.object(bootstrap.urllib.request, 'urlopen', return_value=io.BytesIO(b'invalid')):
+                with self.assertRaisesRegex(ValueError, 'integrity mismatch'):
+                    bootstrap.sdk_archive(cache, variant)
+            self.assertEqual(cache.read_bytes(), b'prior')
+
     def test_exact_digest_accepts_and_corruption_rejects(self):
         data = b'pinned SDK bytes'
         digest = 'sha256-' + hashlib.sha256(data).hexdigest()
