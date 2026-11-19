@@ -10,14 +10,14 @@ fail() {
 main() {
     # All declarations below are shell-quoted by the Rust producer.
     mode='install'
-    version='v0.1.5-dev.44619873113.1.g520450181cdd6d0e32ccb7e4522b8cbd164a5ba0'
+    version='v0.1.5-dev.44628055357.1.g342afa795c39b8273588ecf07f1acb89e843ae0d'
     source_kind='https'
-    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.44619873113.1.g520450181cdd6d0e32ccb7e4522b8cbd164a5ba0'
+    source_location='https://github.com/ChronoAIProject/chrono-harness/releases/download/v0.1.5-dev.44628055357.1.g342afa795c39b8273588ecf07f1acb89e843ae0d'
     curl='/usr/bin/curl'
     default_tools='chrono-cache chrono-ci chrono-distribution chrono-harness chrono-inputs chrono-instructions chrono-judge-ci chrono-judge-cost chrono-judge-filemap chrono-judge-mixed chrono-judge-projects chrono-judge-registration chrono-judge-routes chrono-judge-workflow chrono-pr chrono-worktree'
-    manifest_sha256='3a5e068402166cb48fd438f9c5ad3b41f2451c8a0453917e2b12b957b64f0a19'
+    manifest_sha256='67cbf3910554dda8d673453fb0e8c2614ca8d28c1cb9eb7ab56cf5290884581b'
     manifest_size='6649'
-    lock_sha256='5dc5c6ecb0cea97bba18da87fe0c075e46f1358cde03e79386c5ed3ac0e17b19'
+    lock_sha256='b57990e120e22c79b685acab4da7be7b200f8fa51f582d987c7fb134f846ba6b'
     lock_size=1946
 
     host_root=.
@@ -59,8 +59,8 @@ main() {
         *) fail 'unsupported operating system or architecture' ;;
     esac
     case "$platform" in
-        'linux-x86_64') installer_sha256='d7bcc794d9236c29a02053e09b1c5ad7cafeed5492e427dd40d45bb86aec4a1c'; installer_size=1695608 ;;
-        'macos-aarch64') installer_sha256='39a345e296a800fc179b19b613b1e4f082f8922f43cc5ec167430401f692c1c9'; installer_size=1346864 ;;
+        'linux-x86_64') installer_sha256='c453b650675df1db09e26038ce87fa3379aa7fc0e49174cd203275737663571d'; installer_size=1695672 ;;
+        'macos-aarch64') installer_sha256='6776ae2be3d976d5dfd31e8ca1104cceff870200d7767b1052abfbea015174ea'; installer_size=1346864 ;;
 
         *) fail "release has no installer for $platform" ;;
     esac
