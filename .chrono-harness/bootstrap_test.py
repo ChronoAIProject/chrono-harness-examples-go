@@ -96,13 +96,15 @@ class Distribution(unittest.TestCase):
         data = buffer.getvalue()
         archive = root / 'sdk.tgz'
         archive.write_bytes(data)
+        variants = {'any': {'url': archive.as_uri(), 'integrity': 'sha256-' + hashlib.sha256(data).hexdigest()}}
+        (root / '.chrono-harness/needed.json').write_text(json.dumps(variants))
         return {
-            'schema': 'chrono-example-sdk/v2', 'default_profile': 'all',
+            'schema': 'chrono-example-sdk/v3', 'default_profile': 'all',
             'downloads': [
                 {'id': 'needed', 'directory': '.chrono-harness/cache/needed',
-                 'variants': {'any': {'url': archive.as_uri(), 'integrity': 'sha256-' + hashlib.sha256(data).hexdigest()}}},
+                 'variants_file': '.chrono-harness/needed.json'},
                 {'id': 'unrelated', 'directory': '.chrono-harness/cache/unrelated',
-                 'variants': {'any': {'url': (root / 'must-not-download').as_uri(), 'integrity': 'sha256-' + '0' * 64}}},
+                 'variants_file': '.chrono-harness/not-read.json'},
             ],
             'probes': {'selected': [str(root / 'selected-probe')], 'unrelated': [str(root / 'must-not-run')]},
             'profiles': {
@@ -193,6 +195,17 @@ class Distribution(unittest.TestCase):
                 else:
                     config['downloads'].append(config['downloads'][0])
                 with self.assertRaisesRegex(ValueError, 'E_BOOTSTRAP_PROFILE'):
+                    self.run_profile(config, root)
+                self.assertFalse((root / '.chrono-harness/state/installer-ran').exists())
+
+    def test_selected_sdk_file_must_exist_inside_host_before_install(self):
+        for filename, error in [('.chrono-harness/missing.json', FileNotFoundError),
+                                ('../elsewhere.json', ValueError)]:
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as d:
+                root = Path(d)
+                config = self.fixture(root)
+                config['downloads'][0]['variants_file'] = filename
+                with self.assertRaises(error):
                     self.run_profile(config, root)
                 self.assertFalse((root / '.chrono-harness/state/installer-ran').exists())
 

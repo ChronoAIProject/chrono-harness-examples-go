@@ -137,10 +137,11 @@
             ".chrono-harness/cache/downloads/"
           ],
           "compatibility_files": [
-            ".chrono-harness/bootstrap.json"
+            ".chrono-harness/sdk/go.json"
           ],
           "source_files": [
-            ".chrono-harness/bootstrap.py"
+            ".chrono-harness/bootstrap.py",
+            ".chrono-harness/bootstrap.json"
           ],
           "consumers": [
             "unit_rates"
