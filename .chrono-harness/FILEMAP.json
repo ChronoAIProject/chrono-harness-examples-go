@@ -119,6 +119,18 @@
       ]
     },
     {
+      "path": ".chrono-harness/sdk/go.json",
+      "owner": "bootstrap",
+      "surface": "membership",
+      "cost": "unmeasured",
+      "edges": [
+        {
+          "kind": "test-execution",
+          "to": "test:rates-tests"
+        }
+      ]
+    },
+    {
       "path": ".chrono-harness/projects.json",
       "owner": "repository",
       "surface": "membership",
