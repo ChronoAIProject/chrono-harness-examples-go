@@ -115,6 +115,7 @@
           "paths": [
             ".chrono-harness/bin/"
           ],
+          "release_install_layout": true,
           "compatibility_files": [
             ".chrono-harness/distribution.json"
           ],
