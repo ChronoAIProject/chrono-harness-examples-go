@@ -41,9 +41,9 @@ def unpack(data, target):
                     raise ValueError('archive link escapes distribution')
         archive.extractall(target)
 
-def selection(cfg, requested):
+def selection(cfg, requested, root):
     """Validate explicit profile references before performing installation effects."""
-    if cfg['schema'] != 'chrono-example-sdk/v2':
+    if cfg['schema'] != 'chrono-example-sdk/v3':
         raise ValueError('E_BOOTSTRAP_PROFILE: unsupported bootstrap schema')
     downloads = {}
     for item in cfg['downloads']:
@@ -66,7 +66,15 @@ def selection(cfg, requested):
     if name not in profiles:
         raise ValueError('E_BOOTSTRAP_PROFILE: unknown profile '+name)
     profile = profiles[name]
-    return name, [downloads[key] for key in profile['downloads']], {key: cfg['probes'][key] for key in profile['probes']}
+    selected = []
+    for key in profile['downloads']:
+        item = downloads[key]
+        relative = Path(item['variants_file'])
+        path = (root / relative).resolve()
+        if relative.is_absolute() or not path.is_relative_to(root):
+            raise ValueError('E_BOOTSTRAP_PROFILE: SDK declaration must be inside the host')
+        selected.append({**item, 'variants': json.loads(path.read_text())})
+    return name, selected, {key: cfg['probes'][key] for key in profile['probes']}
 
 def observe_probe(root, argv):
     """Observe only an explicitly selected command; never update expected identities."""
@@ -113,7 +121,7 @@ def main():
     args = parser.parse_args()
     root = args.host.resolve()
     cfg = json.loads((root / '.chrono-harness/bootstrap.json').read_text())
-    profile, downloads, probes = selection(cfg, args.profile)
+    profile, downloads, probes = selection(cfg, args.profile, root)
     subprocess.run(['/bin/sh', str(root / '.chrono-harness/install.sh'), '--host-root', str(root)], check=True)
     distribution = json.loads((root / '.chrono-harness/state/distribution.json').read_text())
     state = root / '.chrono-harness/state'
